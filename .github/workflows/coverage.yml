@@ -1,0 +1,65 @@
+name: Coverage
+
+on:
+  push:
+    branches: [ master ]
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  cd:
+    strategy:
+      fail-fast: true
+
+    name: Reservoir Coverage Report
+    runs-on: ubuntu-latest
+    environment: test
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.FORTUNABOT_REPOS }}
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install dependencies
+        run: |
+          cd lib/chainlink
+          yarn install
+        id: installdep
+
+      - name: Run Forge build
+        run: |
+          forge --version
+          forge build --sizes
+        id: build
+
+      # Setup using https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: us-west-2
+
+      - name: Publish cod cov badge
+        run: |
+          # From https://itnext.io/github-actions-code-coverage-without-third-parties-f1299747064d
+          total=`forge coverage | tail -1 | cut -d '|' -f 3 | awk '{print $1}' | grep -Eo '[0-9]+\.[0-9]+'`
+
+          if (( $(echo "$total <= 50" | bc -l) )) ; then
+            COLOR=red
+          elif (( $(echo "$total > 80" | bc -l) )); then
+            COLOR=green
+          else
+            COLOR=orange
+          fi
+
+          curl "https://img.shields.io/badge/coverage-$total%25-$COLOR" > coverage.svg
+          aws s3 cp coverage.svg s3://${{ vars.COVERAGE_BUCKET_NAME }}/${GITHUB_REF_NAME}/

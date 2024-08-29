@@ -1,0 +1,13 @@
+cache/
+out/
+broadcast/
+
+# dotenv environment variables file
+.env
+lcov.info
+**/*.swp
+
+.vscode/
+
+.DS_Store
+coverage/

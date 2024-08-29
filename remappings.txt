@@ -1,0 +1,6 @@
+chainlink/=lib/chainlink/
+ds-test/=lib/forge-std/lib/ds-test/src/
+erc4626-tests/=lib/offchain-fund/lib/openzeppelin-contracts/lib/erc4626-tests/
+forge-std/=lib/forge-std/src/
+offchain-fund/=lib/offchain-fund/
+openzeppelin-contracts/=lib/openzeppelin-contracts/

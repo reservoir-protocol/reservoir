@@ -1,0 +1,50 @@
+name: Build
+
+on: push
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  check:
+    strategy:
+      fail-fast: true
+
+    name: Reservoir Unit Tests
+    runs-on: ubuntu-latest
+    environment: test
+    env:
+      ALCHEMY_KEY: ${{ secrets.ALCHEMY_KEY }}
+      MAINNET_RPC_URL: ${{ secrets.MAINNET_RPC_URL }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          token: ${{ secrets.FORTUNABOT_REPOS }}
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install dependencies
+        run: |
+          cd lib/chainlink
+          yarn install
+        id: installdep
+
+      - name: Run Forge build
+        run: |
+          forge --version
+          forge build --sizes
+        id: build
+      - name: Run Forge tests
+        run: |
+          cp .env.template .env
+          forge test -vvv
+        id: testrun
+
+      - name: Snapshot Forge Gas in tests
+        run: |
+          forge snapshot
+        id: snapshot
