@@ -9,28 +9,24 @@ import {ERC1155Supply} from "openzeppelin-contracts/contracts/token/ERC1155/exte
 contract LiquidTerm is ERC20 {
     uint256 public immutable tokenId;
 
-    IERC1155 public immutable registry;
+    address public immutable registry;
 
     constructor(
-        IERC1155 _registry,
-        uint256 _tokenId
-    ) ERC20("Liquid Term", "ltrUSD") {
-        registry = _registry;
-        tokenId = _tokenId;
+        string memory name_,
+        string memory symbol_,
+        address registry_,
+        uint256 tokenId_
+    ) ERC20(name_, symbol_) {
+        registry = registry_;
+        tokenId = tokenId_;
     }
 
     function totalSupply() public view override returns (uint256) {
-        try ERC1155Supply(address(registry)).totalSupply(tokenId) returns (
-            uint256 amount
-        ) {
-            return amount;
-        } catch {
-            return 0;
-        }
+        return ERC1155Supply(registry).totalSupply(tokenId);
     }
 
     function balanceOf(address account) public view override returns (uint256) {
-        return registry.balanceOf(account, tokenId);
+        return IERC1155(registry).balanceOf(account, tokenId);
     }
 
     function _transfer(
@@ -38,6 +34,6 @@ contract LiquidTerm is ERC20 {
         address to,
         uint256 amount
     ) internal override {
-        registry.safeTransferFrom(from, to, tokenId, amount, "");
+        IERC1155(registry).safeTransferFrom(from, to, tokenId, amount, "");
     }
 }
