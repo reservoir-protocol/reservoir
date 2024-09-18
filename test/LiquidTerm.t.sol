@@ -166,4 +166,87 @@ contract LiquidTermTest is Test {
         assertEq(lTerm03.balanceOf(receiver), 1e18);
         assertEq(lTerm03.balanceOf(eoa4), 999e18);
     }
+
+    function testTransferFrom() external {
+        address receiver = vm.addr(uint256(keccak256("receiver")));
+
+        term.grantRole(term.MINTER(), address(this));
+
+        term.mint(eoa1, 0, 1_000e18);
+        term.mint(eoa2, 1, 1_000e18);
+        term.mint(eoa3, 2, 1_000e18);
+        term.mint(eoa4, 3, 1_000e18);
+
+        // eoa1
+
+        assertEq(lTerm00.balanceOf(receiver), 0);
+        assertEq(lTerm00.balanceOf(eoa1), 1_000e18);
+
+        vm.prank(eoa1);
+        term.setApprovalForAll(address(lTerm00), true);
+
+        vm.prank(eoa1);
+        lTerm00.approve(address(this), 1e18);
+
+        lTerm00.transferFrom(eoa1, receiver, 1e18);
+
+        assertEq(lTerm00.balanceOf(receiver), 1e18);
+        assertEq(lTerm00.balanceOf(eoa1), 999e18);
+
+        assertEq(lTerm00.allowance(eoa1, receiver), 0);
+
+        // eoa2
+
+        assertEq(lTerm01.balanceOf(receiver), 0);
+        assertEq(lTerm01.balanceOf(eoa2), 1_000e18);
+
+        vm.prank(eoa2);
+        term.setApprovalForAll(address(lTerm01), true);
+
+        vm.prank(eoa2);
+        lTerm01.approve(address(this), 1e18);
+
+        lTerm01.transferFrom(eoa2, receiver, 1e18);
+
+        assertEq(lTerm01.balanceOf(receiver), 1e18);
+        assertEq(lTerm01.balanceOf(eoa2), 999e18);
+
+        assertEq(lTerm01.allowance(eoa2, receiver), 0);
+
+        // eoa3
+
+        assertEq(lTerm02.balanceOf(receiver), 0);
+        assertEq(lTerm02.balanceOf(eoa3), 1_000e18);
+
+        vm.prank(eoa3);
+        term.setApprovalForAll(address(lTerm02), true);
+
+        vm.prank(eoa3);
+        lTerm02.approve(address(this), 1e18);
+
+        lTerm02.transferFrom(eoa3, receiver, 1e18);
+
+        assertEq(lTerm02.balanceOf(receiver), 1e18);
+        assertEq(lTerm02.balanceOf(eoa3), 999e18);
+
+        assertEq(lTerm02.allowance(eoa3, receiver), 0);
+
+        // eoa4
+
+        assertEq(lTerm03.balanceOf(receiver), 0);
+        assertEq(lTerm03.balanceOf(eoa4), 1_000e18);
+
+        vm.prank(eoa4);
+        term.setApprovalForAll(address(lTerm03), true);
+
+        vm.prank(eoa4);
+        lTerm03.approve(address(this), 1e18);
+
+        lTerm03.transferFrom(eoa4, receiver, 1e18);
+
+        assertEq(lTerm03.balanceOf(receiver), 1e18);
+        assertEq(lTerm03.balanceOf(eoa4), 999e18);
+
+        assertEq(lTerm03.allowance(eoa2, receiver), 0);
+    }
 }
