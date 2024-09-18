@@ -9,44 +9,10 @@ import {ERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/ERC1155.so
 import {ERC1155Supply} from "openzeppelin-contracts/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 
 import {Term} from "src/Term.sol";
+import {LiquidTerm} from "src/LiquidTerm.sol";
 
 import {Test} from "forge-std/Test.sol";
 import {console} from "forge-std/console.sol";
-
-contract LiquidTerm is ERC20 {
-    IERC1155 public immutable registry;
-    uint256 public immutable tokenId;
-
-    constructor(
-        IERC1155 _registry,
-        uint256 _tokenId
-    ) ERC20("Liquid Term", "ltrUSD") {
-        registry = _registry;
-        tokenId = _tokenId;
-    }
-
-    function totalSupply() public view override returns (uint256) {
-        try ERC1155Supply(address(registry)).totalSupply(tokenId) returns (
-            uint256 amount
-        ) {
-            return amount;
-        } catch {
-            return 0;
-        }
-    }
-
-    function balanceOf(address account) public view override returns (uint256) {
-        return registry.balanceOf(account, tokenId);
-    }
-
-    function _transfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override {
-        registry.safeTransferFrom(from, to, tokenId, amount, "");
-    }
-}
 
 // TODO: Liquid Term => Fungible Term
 // TODO: Get term contract address from the token
@@ -73,17 +39,39 @@ contract LiquidTermTest is Test {
         vm.prank(eoa2);
         term.setApprovalForAll(address(this), true);
 
-        lTerm00 = new LiquidTerm(IERC1155(address(term)), 0);
-        lTerm01 = new LiquidTerm(IERC1155(address(term)), 1);
-        lTerm02 = new LiquidTerm(IERC1155(address(term)), 2);
-        lTerm03 = new LiquidTerm(IERC1155(address(term)), 3);
+        lTerm00 = new LiquidTerm("Liquid Term", "ltrUSD-00", address(term), 0);
+        lTerm01 = new LiquidTerm("Liquid Term", "ltrUSD-01", address(term), 1);
+        lTerm02 = new LiquidTerm("Liquid Term", "ltrUSD-02", address(term), 2);
+        lTerm03 = new LiquidTerm("Liquid Term", "ltrUSD-03", address(term), 3);
     }
 
     function testInitialState() external {
-        assertTrue(term.hasRole(0x00, address(this)));
+        assertEq(lTerm00.tokenId(), 0);
+        assertEq(lTerm00.registry(), address(term));
+
+        assertEq(lTerm00.symbol(), "ltrUSD-00");
+        assertEq(lTerm00.name(), "Liquid Term");
+
+        assertEq(lTerm01.tokenId(), 1);
+        assertEq(lTerm01.registry(), address(term));
+
+        assertEq(lTerm02.symbol(), "ltrUSD-02");
+        assertEq(lTerm02.name(), "Liquid Term");
+
+        assertEq(lTerm02.tokenId(), 2);
+        assertEq(lTerm02.registry(), address(term));
+
+        assertEq(lTerm02.symbol(), "ltrUSD-02");
+        assertEq(lTerm02.name(), "Liquid Term");
+
+        assertEq(lTerm03.tokenId(), 3);
+        assertEq(lTerm03.registry(), address(term));
+
+        assertEq(lTerm03.symbol(), "ltrUSD-03");
+        assertEq(lTerm03.name(), "Liquid Term");
     }
 
-    function testMint() external {
+    function testBalanceAndTotalSupply() external {
         term.grantRole(term.MINTER(), address(this));
 
         term.mint(eoa1, 0, 1_000e18);
@@ -127,7 +115,7 @@ contract LiquidTermTest is Test {
         assertEq(lTerm03.balanceOf(eoa4), 1_000e18);
     }
 
-    function testTransferSuccess01() external {
+    function testTransfer() external {
         address receiver = vm.addr(uint256(keccak256("receiver")));
 
         term.grantRole(term.MINTER(), address(this));
@@ -193,68 +181,4 @@ contract LiquidTermTest is Test {
         assertEq(lTerm03.balanceOf(receiver), 1e18);
         assertEq(lTerm03.balanceOf(eoa4), 999e18);
     }
-
-    function testTransferSuccess02() external {
-        assertTrue(true);
-    }
-
-    function testTransferFailure() external {
-        assertTrue(true);
-    }
-
-    // function testBurn() external {
-    //     term.grantRole(term.MINTER(), address(this));
-
-    //     term.mint(eoa1, 0, 12);
-    //     term.mint(eoa2, 1, 26);
-    //     term.mint(eoa2, 2, 1042);
-
-    //     term.burn(eoa1, 0, 8);
-
-    //     term.burn(eoa2, 1, 1);
-    //     term.burn(eoa2, 1, 12);
-    //     term.burn(eoa2, 2, 18);
-
-    //     assertEq(term.balanceOf(eoa1, 0), 4);
-    //     assertEq(term.balanceOf(eoa1, 1), 0);
-    //     assertEq(term.balanceOf(eoa1, 2), 0);
-
-    //     assertEq(term.balanceOf(eoa2, 0), 0);
-    //     assertEq(term.balanceOf(eoa2, 1), 13);
-    //     assertEq(term.balanceOf(eoa2, 2), 1024);
-
-    //     assertEq(term.totalSupply(0), 4);
-    //     assertEq(term.totalSupply(1), 13);
-    //     assertEq(term.totalSupply(2), 1024);
-    // }
-
-    // function testTransfer() external {
-    //     term.grantRole(term.MINTER(), address(this));
-
-    //     term.mint(eoa1, 0, 12);
-    //     term.mint(eoa2, 1, 26);
-    //     term.mint(eoa2, 2, 1042);
-
-    //     term.safeTransferFrom(eoa1, eoa2, 0, 8, "");
-
-    //     assertEq(term.balanceOf(eoa1, 0), 4);
-    //     assertEq(term.balanceOf(eoa2, 0), 8);
-
-    //     uint256[] memory ids = new uint256[](2);
-    //     uint256[] memory amounts = new uint256[](2);
-
-    //     ids[0] = 1;
-    //     ids[1] = 2;
-
-    //     amounts[0] = 26;
-    //     amounts[1] = 34;
-
-    //     term.safeBatchTransferFrom(eoa2, eoa1, ids, amounts, "");
-
-    //     assertEq(term.balanceOf(eoa1, 1), 26);
-    //     assertEq(term.balanceOf(eoa1, 2), 34);
-
-    //     assertEq(term.balanceOf(eoa2, 1), 0);
-    //     assertEq(term.balanceOf(eoa2, 2), 1008);
-    // }
 }
