@@ -2,20 +2,11 @@
 
 pragma solidity ^0.8.24;
 
-import {IERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol";
-
-import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import {ERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/ERC1155.sol";
-import {ERC1155Supply} from "openzeppelin-contracts/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
-
 import {Term} from "src/Term.sol";
 import {LiquidTerm} from "src/LiquidTerm.sol";
 
 import {Test} from "forge-std/Test.sol";
 import {console} from "forge-std/console.sol";
-
-// TODO: Liquid Term => Fungible Term
-// TODO: Get term contract address from the token
 
 contract LiquidTermTest is Test {
     Term term;
@@ -32,12 +23,6 @@ contract LiquidTermTest is Test {
 
     function setUp() external {
         term = new Term(address(this), "https://reservoir.xyz");
-
-        vm.prank(eoa1);
-        term.setApprovalForAll(address(this), true);
-
-        vm.prank(eoa2);
-        term.setApprovalForAll(address(this), true);
 
         lTerm00 = new LiquidTerm("Liquid Term", "ltrUSD-00", address(term), 0);
         lTerm01 = new LiquidTerm("Liquid Term", "ltrUSD-01", address(term), 1);
