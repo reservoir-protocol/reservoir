@@ -29,4 +29,18 @@ contract DAM is AccessControl, ERC20Votes {
     function mint(address account, uint256 amount) external onlyRole(MINTER) {
         _mint(account, amount);
     }
+
+    /// @notice Decrease token total supply
+    /// @param amount Quantity of token deducted
+    function burn(uint256 amount) public virtual {
+        _burn(_msgSender(), amount);
+    }
+
+    /// @notice Decrease token total supply
+    /// @param account Address to decrement the token balance
+    /// @param amount Quantity of token deducted
+    function burnFrom(address account, uint256 amount) public virtual {
+        _spendAllowance(account, _msgSender(), amount);
+        _burn(account, amount);
+    }
 }
