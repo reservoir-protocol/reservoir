@@ -6,6 +6,7 @@ import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessContr
 
 import {IERC4626} from "openzeppelin-contracts/contracts/interfaces/IERC4626.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import {SafeCast} from "openzeppelin-contracts/contracts/utils/math/SafeCast.sol";
 
 import {Stablecoin} from "../Stablecoin.sol";
 import {IOracle} from "src/interfaces/IOracle.sol";
@@ -60,10 +61,15 @@ contract MorphoRUSDAdapter is IAssetAdapter, AccessControl {
 
     function redeem(uint256 shares) public onlyRole(CONTROLLER) {
         Stablecoin underlyingStablecoin = Stablecoin(address(underlying));
+
+        uint256 initialBalance = underlyingStablecoin.balanceOf(address(this));
+
         vault.redeem(shares, address(this), address(this));
-        underlyingStablecoin.burn(
-            underlyingStablecoin.balanceOf(address(this))
-        );
+
+        uint256 receivedAmount = underlyingStablecoin.balanceOf(address(this)) -
+            initialBalance;
+
+        underlyingStablecoin.burn(receivedAmount);
 
         emit Redeem(msg.sender, shares, block.timestamp);
     }
@@ -187,13 +193,13 @@ contract MorphoRUSDAdapter is IAssetAdapter, AccessControl {
     {
         int256 latestAnswer = underlyingPriceOracle.latestAnswer();
 
-        return latestAnswer > 0 ? uint256(latestAnswer) : 0;
+        return latestAnswer > 0 ? SafeCast.toUint256(latestAnswer) : 0;
     }
 
     function _fundPriceOracleLatestAnswer() private view returns (uint256) {
         int256 latestAnswer = fundPriceOracle.latestAnswer();
 
-        return latestAnswer > 0 ? uint256(latestAnswer) : 0;
+        return latestAnswer > 0 ? SafeCast.toUint256(latestAnswer) : 0;
     }
 
     function recover(address _token) external onlyRole(MANAGER) {
