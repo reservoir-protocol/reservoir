@@ -60,10 +60,15 @@ contract MorphoRUSDAdapter is IAssetAdapter, AccessControl {
 
     function redeem(uint256 shares) public onlyRole(CONTROLLER) {
         Stablecoin underlyingStablecoin = Stablecoin(address(underlying));
+
+        uint256 initialBalance = underlyingStablecoin.balanceOf(address(this));
+
         vault.redeem(shares, address(this), address(this));
-        underlyingStablecoin.burn(
-            underlyingStablecoin.balanceOf(address(this))
-        );
+
+        uint256 receivedAmount = underlyingStablecoin.balanceOf(address(this)) -
+            initialBalance;
+
+        underlyingStablecoin.burn(receivedAmount);
 
         emit Redeem(msg.sender, shares, block.timestamp);
     }
