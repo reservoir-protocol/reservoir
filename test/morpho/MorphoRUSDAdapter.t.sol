@@ -304,6 +304,25 @@ contract MorphoRUSDAdapterTest is Test {
         assertEq(adapter.fundBalance(), metamorpho.balanceOf(address(adapter)));
     }
 
+    function test_redeem_with_accidental_sent_tokens(
+        uint256 depositAmount,
+        uint256 redeemAmount,
+        uint256 accidentalySentAmount
+    ) external {
+        vm.assume(depositAmount <= 1_000_000_000e18);
+        vm.assume(redeemAmount <= depositAmount);
+        vm.assume(accidentalySentAmount <= 1_000_000_000e18);
+
+        adapter.deposit(depositAmount);
+
+        deal(address(rusd), address(this), accidentalySentAmount, true);
+        rusd.transfer(address(adapter), accidentalySentAmount);
+
+        adapter.redeem(redeemAmount);
+
+        assertEq(rusd.balanceOf(address(adapter)), accidentalySentAmount);
+    }
+
     function testDepositUnauthorized(uint256 amount) external {
         adapter.revokeRole(adapter.CONTROLLER(), address(this));
 
@@ -370,5 +389,26 @@ contract MorphoRUSDAdapterTest is Test {
 
         vm.expectRevert();
         adapter.setFundRiskWeight(riskWeight);
+    }
+
+    function test_recover(uint256 _amount) external {
+        ERC20 testToken = new ERC20("Test Token", "TTT");
+
+        deal(address(testToken), address(adapter), _amount);
+
+        assertEq(testToken.balanceOf(address(this)), 0);
+        assertEq(testToken.balanceOf(address(adapter)), _amount);
+
+        adapter.recover(address(testToken));
+
+        assertEq(testToken.balanceOf(address(this)), _amount);
+        assertEq(testToken.balanceOf(address(adapter)), 0);
+    }
+
+    function test_recover_as_non_owner() external {
+        adapter.revokeRole(adapter.MANAGER(), address(this));
+
+        vm.expectRevert();
+        adapter.recover(address(rusd));
     }
 }

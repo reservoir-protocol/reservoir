@@ -498,6 +498,7 @@ contract MorphoUnderlyingAdapterTest is Test {
 
     function testRecover(uint256 _amount, address _reciever) external {
         vm.assume(_reciever != address(0));
+        vm.assume(_reciever != address(adapter));
 
         ERC20 testToken = new ERC20("Test Token", "TTT");
         deal(address(testToken), address(adapter), _amount);
