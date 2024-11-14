@@ -37,6 +37,12 @@ contract MorphoRUSDAdapterTest is Test {
 
     string MAINNET_RPC_URL = vm.envString("MAINNET_RPC_URL");
 
+    // avoid stack too deep errors for testDepositRedeemFlow test
+    uint256 depositShares1;
+    uint256 redeemShares1;
+    uint256 depositShares2;
+    uint256 redeemShares2;
+
     function setUp() external {
         vm.createSelectFork(MAINNET_RPC_URL);
 
@@ -112,25 +118,36 @@ contract MorphoRUSDAdapterTest is Test {
         emit Deposit(address(this), depositAmount1, block.timestamp);
         adapter.deposit(depositAmount1);
 
-        assertEq(
+        depositShares1 = metamorpho.convertToShares(depositAmount1);
+
+        assertApproxEqAbs(
             metamorpho.convertToAssets(metamorpho.balanceOf(address(adapter))),
-            depositAmount1
+            depositAmount1,
+            10
         );
         assertEq(rusd.balanceOf(address(adapter)), 0);
         assertEq(rusd.balanceOf(address(this)), 0);
 
-        assertEq(rusd.totalSupply(), initialRusdTotalSupply + depositAmount1);
+        assertApproxEqAbs(
+            rusd.totalSupply(),
+            initialRusdTotalSupply + depositAmount1,
+            10
+        );
 
-        assertEq(
+        assertApproxEqAbs(
             adapter.totalValue(),
-            (uint256(vaultSharesOracleV2.latestAnswer()) * depositAmount1) / 1e8
+            (uint256(vaultSharesOracleV2.latestAnswer()) * depositShares1) /
+                1e8,
+            10
         );
         assertEq(adapter.fundTotalValue(), adapter.totalValue());
-        assertEq(
+
+        assertApproxEqAbs(
             adapter.totalRiskValue(),
             (riskWeight *
                 ((uint256(vaultSharesOracleV2.latestAnswer()) *
-                    depositAmount1) / 1e8)) / 1e6
+                    depositShares1) / 1e8)) / 1e6,
+            10
         );
         assertEq(adapter.fundTotalRiskValue(), adapter.totalRiskValue());
         assertEq(adapter.underlyingTotalRiskValue(), 0);
@@ -139,32 +156,43 @@ contract MorphoRUSDAdapterTest is Test {
         assertEq(adapter.fundBalance(), metamorpho.balanceOf(address(adapter)));
 
         vm.expectEmit(true, true, true, true);
-        emit Redeem(address(this), redeemAmount1, block.timestamp);
-        adapter.redeem(redeemAmount1);
+        emit Redeem(
+            address(this),
+            metamorpho.convertToShares(redeemAmount1),
+            block.timestamp
+        );
+        adapter.redeem(metamorpho.convertToShares(redeemAmount1));
 
-        assertEq(
+        depositShares1 = metamorpho.convertToShares(depositAmount1);
+        redeemShares1 = metamorpho.convertToShares(redeemAmount1);
+
+        assertApproxEqAbs(
             metamorpho.convertToAssets(metamorpho.balanceOf(address(adapter))),
-            depositAmount1 - redeemAmount1
+            depositAmount1 - redeemAmount1,
+            10
         );
         assertEq(rusd.balanceOf(address(adapter)), 0);
         assertEq(rusd.balanceOf(address(this)), 0);
 
-        assertEq(
+        assertApproxEqAbs(
             rusd.totalSupply(),
-            initialRusdTotalSupply + depositAmount1 - redeemAmount1
+            initialRusdTotalSupply + depositAmount1 - redeemAmount1,
+            10
         );
 
-        assertEq(
+        assertApproxEqAbs(
             adapter.totalValue(),
             (uint256(vaultSharesOracleV2.latestAnswer()) *
-                (depositAmount1 - redeemAmount1)) / 1e8
+                (depositShares1 - redeemShares1)) / 1e8,
+            10
         );
         assertEq(adapter.fundTotalValue(), adapter.totalValue());
-        assertEq(
+        assertApproxEqAbs(
             adapter.totalRiskValue(),
             (riskWeight *
                 ((uint256(vaultSharesOracleV2.latestAnswer()) *
-                    (depositAmount1 - redeemAmount1)) / 1e8)) / 1e6
+                    (depositShares1 - redeemShares1)) / 1e8)) / 1e6,
+            10
         );
         assertEq(adapter.fundTotalRiskValue(), adapter.totalRiskValue());
         assertEq(adapter.underlyingTotalRiskValue(), 0);
@@ -176,33 +204,41 @@ contract MorphoRUSDAdapterTest is Test {
         emit Deposit(address(this), depositAmount2, block.timestamp);
         adapter.deposit(depositAmount2);
 
-        assertEq(
+        depositShares1 = metamorpho.convertToShares(depositAmount1);
+        redeemShares1 = metamorpho.convertToShares(redeemAmount1);
+        depositShares2 = metamorpho.convertToShares(depositAmount2);
+
+        assertApproxEqAbs(
             metamorpho.convertToAssets(metamorpho.balanceOf(address(adapter))),
-            depositAmount1 - redeemAmount1 + depositAmount2
+            depositAmount1 - redeemAmount1 + depositAmount2,
+            10
         );
         assertEq(rusd.balanceOf(address(adapter)), 0);
         assertEq(rusd.balanceOf(address(this)), 0);
 
-        assertEq(
+        assertApproxEqAbs(
             rusd.totalSupply(),
             initialRusdTotalSupply +
                 depositAmount1 -
                 redeemAmount1 +
-                depositAmount2
+                depositAmount2,
+            10
         );
 
-        assertEq(
+        assertApproxEqAbs(
             adapter.totalValue(),
             (uint256(vaultSharesOracleV2.latestAnswer()) *
-                (depositAmount1 - redeemAmount1 + depositAmount2)) / 1e8
+                (depositShares1 - redeemShares1 + depositShares2)) / 1e8,
+            10
         );
         assertEq(adapter.fundTotalValue(), adapter.totalValue());
-        assertEq(
+        assertApproxEqAbs(
             adapter.totalRiskValue(),
             (riskWeight *
                 ((uint256(vaultSharesOracleV2.latestAnswer()) *
-                    (depositAmount1 - redeemAmount1 + depositAmount2)) / 1e8)) /
-                1e6
+                    (depositShares1 - redeemShares1 + depositShares2)) / 1e8)) /
+                1e6,
+            10
         );
         assertEq(adapter.fundTotalRiskValue(), adapter.totalRiskValue());
         assertEq(adapter.underlyingTotalRiskValue(), 0);
@@ -211,42 +247,55 @@ contract MorphoRUSDAdapterTest is Test {
         assertEq(adapter.fundBalance(), metamorpho.balanceOf(address(adapter)));
 
         vm.expectEmit(true, true, true, true);
-        emit Redeem(address(this), redeemAmount2, block.timestamp);
-        adapter.redeem(redeemAmount2);
+        emit Redeem(
+            address(this),
+            metamorpho.convertToShares(redeemAmount2),
+            block.timestamp
+        );
+        adapter.redeem(metamorpho.convertToShares(redeemAmount2));
 
-        assertEq(
+        depositShares1 = metamorpho.convertToShares(depositAmount1);
+        redeemShares1 = metamorpho.convertToShares(redeemAmount1);
+        depositShares2 = metamorpho.convertToShares(depositAmount2);
+        redeemShares2 = metamorpho.convertToShares(redeemAmount2);
+
+        assertApproxEqAbs(
             metamorpho.convertToAssets(metamorpho.balanceOf(address(adapter))),
-            depositAmount1 - redeemAmount1 + depositAmount2 - redeemAmount2
+            depositAmount1 - redeemAmount1 + depositAmount2 - redeemAmount2,
+            10
         );
         assertEq(rusd.balanceOf(address(adapter)), 0);
         assertEq(rusd.balanceOf(address(this)), 0);
 
-        assertEq(
+        assertApproxEqAbs(
             rusd.totalSupply(),
             initialRusdTotalSupply +
                 depositAmount1 -
                 redeemAmount1 +
                 depositAmount2 -
-                redeemAmount2
+                redeemAmount2,
+            10
         );
 
-        assertEq(
+        assertApproxEqAbs(
             adapter.totalValue(),
             (uint256(vaultSharesOracleV2.latestAnswer()) *
-                (depositAmount1 -
-                    redeemAmount1 +
-                    depositAmount2 -
-                    redeemAmount2)) / 1e8
+                (depositShares1 -
+                    redeemShares1 +
+                    depositShares2 -
+                    redeemShares2)) / 1e8,
+            10
         );
         assertEq(adapter.fundTotalValue(), adapter.totalValue());
-        assertEq(
+        assertApproxEqAbs(
             adapter.totalRiskValue(),
             (riskWeight *
                 ((uint256(vaultSharesOracleV2.latestAnswer()) *
-                    (depositAmount1 -
-                        redeemAmount1 +
-                        depositAmount2 -
-                        redeemAmount2)) / 1e8)) / 1e6
+                    (depositShares1 -
+                        redeemShares1 +
+                        depositShares2 -
+                        redeemShares2)) / 1e8)) / 1e6,
+            10
         );
         assertEq(adapter.fundTotalRiskValue(), adapter.totalRiskValue());
         assertEq(adapter.underlyingTotalRiskValue(), 0);
@@ -255,13 +304,24 @@ contract MorphoRUSDAdapterTest is Test {
         assertEq(adapter.fundBalance(), metamorpho.balanceOf(address(adapter)));
     }
 
-    //! DONT KNOW WHATS THE REAL CAP
-    // function testDepositMoreThenCap(uint256 amount) external {
-    //     vm.assume(amount > CAP);
+    function test_redeem_with_accidental_sent_tokens(
+        uint256 depositAmount,
+        uint256 redeemAmount,
+        uint256 accidentalySentAmount
+    ) external {
+        vm.assume(depositAmount <= 1_000_000_000e18);
+        vm.assume(redeemAmount <= depositAmount);
+        vm.assume(accidentalySentAmount <= 1_000_000_000e18);
 
-    //     vm.expectRevert();
-    //     adapter.deposit(amount);
-    // }
+        adapter.deposit(depositAmount);
+
+        deal(address(rusd), address(this), accidentalySentAmount, true);
+        rusd.transfer(address(adapter), accidentalySentAmount);
+
+        adapter.redeem(redeemAmount);
+
+        assertEq(rusd.balanceOf(address(adapter)), accidentalySentAmount);
+    }
 
     function testDepositUnauthorized(uint256 amount) external {
         adapter.revokeRole(adapter.CONTROLLER(), address(this));
@@ -329,5 +389,26 @@ contract MorphoRUSDAdapterTest is Test {
 
         vm.expectRevert();
         adapter.setFundRiskWeight(riskWeight);
+    }
+
+    function test_recover(uint256 _amount) external {
+        ERC20 testToken = new ERC20("Test Token", "TTT");
+
+        deal(address(testToken), address(adapter), _amount);
+
+        assertEq(testToken.balanceOf(address(this)), 0);
+        assertEq(testToken.balanceOf(address(adapter)), _amount);
+
+        adapter.recover(address(testToken));
+
+        assertEq(testToken.balanceOf(address(this)), _amount);
+        assertEq(testToken.balanceOf(address(adapter)), 0);
+    }
+
+    function test_recover_as_non_owner() external {
+        adapter.revokeRole(adapter.MANAGER(), address(this));
+
+        vm.expectRevert();
+        adapter.recover(address(rusd));
     }
 }
