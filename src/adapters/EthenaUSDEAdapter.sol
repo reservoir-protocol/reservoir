@@ -4,11 +4,13 @@ pragma solidity ^0.8.24;
 
 import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
-import {IERC4626} from "openzeppelin-contracts/contracts/interfaces/IERC4626.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import {IERC4626} from "openzeppelin-contracts/contracts/interfaces/IERC4626.sol";
 
-import {Stablecoin} from "../Stablecoin.sol";
+// import {Stablecoin} from "../Stablecoin.sol";
+
 import {IOracle} from "src/interfaces/IOracle.sol";
+
 import {IAssetAdapter} from "src/interfaces/IAssetAdapter.sol";
 
 contract EthenaSUSDEAdapter is IAssetAdapter, AccessControl {
@@ -18,41 +20,59 @@ contract EthenaSUSDEAdapter is IAssetAdapter, AccessControl {
     bytes32 public constant CONTROLLER =
         keccak256(abi.encode("asset.adapter.controller"));
 
+    IERC4626 public immutable fund;
     IERC20 public immutable underlying;
-    IERC4626 public immutable vault;
+
+    address public immutable holder;
+
     uint256 public immutable duration;
 
-    IOracle public immutable underlyingPriceOracle;
     IOracle public immutable fundPriceOracle;
+    IOracle public immutable underlyingPriceOracle;
 
-    uint256 public underlyingRiskWeight; // 100% = 1e6
     uint256 public fundRiskWeight; // 100% = 1e6
+    uint256 public underlyingRiskWeight; // 100% = 1e6
 
     constructor(
         address _admin,
+        address _holder,
+        address _fundAddr,
         address _underlyingAddr,
-        address _vaultAddr,
-        // address _underlyingPriceOracleAddr,
-        // address _fundPriceOracleAddr,
         uint256 _duration
     ) {
         _grantRole(DEFAULT_ADMIN_ROLE, _admin);
 
+        fund = IERC4626(_fundAddr);
         underlying = IERC20(_underlyingAddr);
-        vault = IERC4626(_vaultAddr);
-        duration = _duration;
 
-        underlyingPriceOracle = IOracle(_underlyingPriceOracleAddr);
-        fundPriceOracle = IOracle(_fundPriceOracleAddr);
+        holder = _holder;
+
+        duration = _duration;
     }
 
-    function allocate(uint256) external {}
+    function allocate(uint256 _assets) external {
+        underlying.transferFrom(msg.sender, address(this), _assets);
 
-    function withdraw(uint256) external {}
+        emit Allocate(msg.sender, _assets, block.timestamp);
+    }
 
-    function deposit(uint256) external {}
+    function withdraw(uint256 _assets) external {
+        underlying.transfer(msg.sender, _assets);
 
-    function redeem(uint256) external {}
+        emit Withdraw(msg.sender, _assets, block.timestamp);
+    }
+
+    function deposit(uint256 amount) public onlyRole(CONTROLLER) {
+        // TODO: Replace with swap and deposit
+
+        underlying.transfer(holder, amount);
+
+        emit Deposit(msg.sender, amount, block.timestamp);
+    }
+
+    function redeem(uint256) public onlyRole(CONTROLLER) {
+        // TODO: Replace with redeem and swap
+    }
 
     function setUnderlyingRiskWeight(
         uint256 _riskWeight
@@ -73,13 +93,13 @@ contract EthenaSUSDEAdapter is IAssetAdapter, AccessControl {
     }
 
     function totalValue() external view returns (uint256 total) {
-        total += _underlyingTotalValue();
         total += _fundTotalValue();
+        total += _underlyingTotalValue();
     }
 
     function totalRiskValue() external view returns (uint256 total) {
-        total += _underlyingTotalRiskValue();
         total += _fundTotalRiskValue();
+        total += _underlyingTotalRiskValue();
     }
 
     function underlyingTotalRiskValue() external view returns (uint256) {
@@ -156,7 +176,8 @@ contract EthenaSUSDEAdapter is IAssetAdapter, AccessControl {
 
     function _fundValue(uint256 amount) private view returns (uint256) {
         // return (_fundPriceOracleLatestAnswer() * amount) / 1e8;
-        return vault.previewDeposit(underlying.totalBalance(address(this)));
+        // return fund.previewDeposit(underlying.balanceOf(holder)); // wrong underlying
+        return fund.previewRedeem(amount); // wrong underlying
     }
 
     function fundBalance() external view returns (uint256) {
@@ -164,7 +185,7 @@ contract EthenaSUSDEAdapter is IAssetAdapter, AccessControl {
     }
 
     function _fundBalance() private view returns (uint256) {
-        return vault.balanceOf(address(this));
+        return fund.balanceOf(holder);
     }
 
     function _underlyingPriceOracleLatestAnswer()
@@ -172,15 +193,11 @@ contract EthenaSUSDEAdapter is IAssetAdapter, AccessControl {
         view
         returns (uint256)
     {
-        int256 latestAnswer = underlyingPriceOracle.latestAnswer();
-
-        return latestAnswer > 0 ? uint256(latestAnswer) : 0;
+        return 1e8;
     }
 
     function _fundPriceOracleLatestAnswer() private view returns (uint256) {
-        int256 latestAnswer = fundPriceOracle.latestAnswer();
-
-        return latestAnswer > 0 ? uint256(latestAnswer) : 0;
+        return fund.previewRedeem(1e18);
     }
 
     function recover(address _token) external onlyRole(MANAGER) {
