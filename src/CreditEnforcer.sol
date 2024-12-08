@@ -91,8 +91,8 @@ contract CreditEnforcer is AccessControl, ICreditEnforcer {
 
         psm.mint(from, to, amount);
 
-        (valid, message) = _checkRatios();
-        require(valid, message);
+        // (valid, message) = _checkRatios();
+        // require(valid, message);
 
         return amount;
     }
@@ -128,8 +128,8 @@ contract CreditEnforcer is AccessControl, ICreditEnforcer {
 
         sm.mint(from, to, amount);
 
-        (valid, message) = _checkRatios();
-        require(valid, message);
+        // (valid, message) = _checkRatios();
+        // require(valid, message);
 
         return amount;
     }

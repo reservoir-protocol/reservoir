@@ -68,16 +68,11 @@ contract ReservoirScript is Script, Test {
 
         vm.startBroadcast();
 
-        rusd = new Stablecoin(msg.sender, "Reservoir Stablecoin", "rUSD");
+        rusd = Stablecoin(0x09d4214c03d01f49544c0448dbe3a27f768f2b34);
 
-        psm = new PegStabilityModule(
-            msg.sender,
-            address(usdcAggregator),
-            IToken(address(rusd)),
-            IERC20(address(usdc))
-        );
+        psm = PegStabilityModule(0x4809010926aec940b550d34a46a52739f996d75d);
 
-        rusd.grantRole(rusd.MINTER(), address(psm));
+        // rusd.grantRole(rusd.MINTER(), address(psm));
 
         vm.stopBroadcast();
 
@@ -118,16 +113,12 @@ contract ReservoirScript is Script, Test {
 
         vm.startBroadcast();
 
-        srusd = new Savingcoin(msg.sender, "Savings rUSD", "srUSD");
+        srusd = Savingcoin(0x738d1115b90efa71ae468f1287fc864775e23a31);
 
-        sm = new SavingModule(
-            msg.sender,
-            IToken(address(rusd)),
-            IToken(address(srusd))
-        );
+        sm = SavingModule(0x5475611dffb8ef4d697ae39df9395513b6e947d7);
 
-        rusd.grantRole(rusd.MINTER(), address(sm));
-        srusd.grantRole(srusd.MINTER(), address(sm));
+        // rusd.grantRole(rusd.MINTER(), address(sm));
+        // srusd.grantRole(srusd.MINTER(), address(sm));
 
         vm.stopBroadcast();
 
@@ -166,17 +157,11 @@ contract ReservoirScript is Script, Test {
 
         vm.startBroadcast();
 
-        term = new Term(msg.sender, "https://reservoir.xyz");
-        termIssuer = new TermIssuer(
-            msg.sender,
-            91.25 days,
-            START_DATE,
-            ITerm(address(term)),
-            IToken(address(rusd))
-        );
+        term = Term(0x6c19e25bd34d063829dd05e2a5fae165ddf2c8dd);
+        termIssuer = TermIssuer(0x128d86a9e854a709df06b884f81eee7240f6ccf7);
 
-        rusd.grantRole(rusd.MINTER(), address(termIssuer));
-        term.grantRole(term.MINTER(), address(termIssuer));
+        // rusd.grantRole(rusd.MINTER(), address(termIssuer));
+        // term.grantRole(term.MINTER(), address(termIssuer));
 
         vm.stopBroadcast();
 
@@ -276,49 +261,49 @@ contract ReservoirScript is Script, Test {
         assertEq(creditEnforcer.equityRatio(), 0);
         assertEq(creditEnforcer.liquidityRatio(), 0);
 
-        vm.startBroadcast();
+        // vm.startBroadcast();
 
-        accountManager = new AccountManager(
-            ICreditEnforcer(address(creditEnforcer)),
-            0.08e12
-        );
+        // accountManager = new AccountManager(
+        //     ICreditEnforcer(address(creditEnforcer)),
+        //     0.08e12
+        // );
 
-        vm.stopBroadcast();
+        // vm.stopBroadcast();
 
-        console.log();
-        console.log(" * Account Manager Address: %s", address(accountManager));
-        console.log(" = > constructor(address,address)");
-        console.log(" - >", address(creditEnforcer));
-        console.log(" - >", 0.08e12);
+        // console.log();
+        // console.log(" * Account Manager Address: %s", address(accountManager));
+        // console.log(" = > constructor(address,address)");
+        // console.log(" - >", address(creditEnforcer));
+        // console.log(" - >", 0.08e12);
 
-        assertEq(address(accountManager.rusd()), address(rusd));
-        assertEq(address(accountManager.term()), address(term));
+        // assertEq(address(accountManager.rusd()), address(rusd));
+        // assertEq(address(accountManager.term()), address(term));
 
-        assertEq(address(accountManager.termIssuer()), address(termIssuer));
-        assertEq(
-            address(accountManager.creditEnforcer()),
-            address(creditEnforcer)
-        );
+        // assertEq(address(accountManager.termIssuer()), address(termIssuer));
+        // assertEq(
+        //     address(accountManager.creditEnforcer()),
+        //     address(creditEnforcer)
+        // );
 
-        assertEq(accountManager.couponRate(), 0.08e12);
+        // assertEq(accountManager.couponRate(), 0.08e12);
 
-        assertFalse(rusd.hasRole(rusd.DEFAULT_ADMIN_ROLE(), ADMIN));
-        assertTrue(rusd.hasRole(rusd.DEFAULT_ADMIN_ROLE(), msg.sender));
+        // assertFalse(rusd.hasRole(rusd.DEFAULT_ADMIN_ROLE(), ADMIN));
+        // assertTrue(rusd.hasRole(rusd.DEFAULT_ADMIN_ROLE(), msg.sender));
 
-        assertFalse(srusd.hasRole(srusd.DEFAULT_ADMIN_ROLE(), ADMIN));
-        assertTrue(srusd.hasRole(srusd.DEFAULT_ADMIN_ROLE(), msg.sender));
+        // assertFalse(srusd.hasRole(srusd.DEFAULT_ADMIN_ROLE(), ADMIN));
+        // assertTrue(srusd.hasRole(srusd.DEFAULT_ADMIN_ROLE(), msg.sender));
 
-        assertFalse(term.hasRole(term.DEFAULT_ADMIN_ROLE(), ADMIN));
-        assertTrue(term.hasRole(term.DEFAULT_ADMIN_ROLE(), msg.sender));
+        // assertFalse(term.hasRole(term.DEFAULT_ADMIN_ROLE(), ADMIN));
+        // assertTrue(term.hasRole(term.DEFAULT_ADMIN_ROLE(), msg.sender));
 
-        assertFalse(sm.hasRole(sm.DEFAULT_ADMIN_ROLE(), ADMIN));
-        assertTrue(sm.hasRole(sm.DEFAULT_ADMIN_ROLE(), msg.sender));
+        // assertFalse(sm.hasRole(sm.DEFAULT_ADMIN_ROLE(), ADMIN));
+        // assertTrue(sm.hasRole(sm.DEFAULT_ADMIN_ROLE(), msg.sender));
 
-        assertFalse(psm.hasRole(psm.DEFAULT_ADMIN_ROLE(), ADMIN));
-        assertTrue(psm.hasRole(psm.DEFAULT_ADMIN_ROLE(), msg.sender));
+        // assertFalse(psm.hasRole(psm.DEFAULT_ADMIN_ROLE(), ADMIN));
+        // assertTrue(psm.hasRole(psm.DEFAULT_ADMIN_ROLE(), msg.sender));
 
-        assertFalse(termIssuer.hasRole(sm.DEFAULT_ADMIN_ROLE(), ADMIN));
-        assertTrue(termIssuer.hasRole(sm.DEFAULT_ADMIN_ROLE(), msg.sender));
+        // assertFalse(termIssuer.hasRole(sm.DEFAULT_ADMIN_ROLE(), ADMIN));
+        // assertTrue(termIssuer.hasRole(sm.DEFAULT_ADMIN_ROLE(), msg.sender));
 
         assertFalse(creditEnforcer.hasRole(psm.DEFAULT_ADMIN_ROLE(), ADMIN));
         assertTrue(
@@ -327,23 +312,23 @@ contract ReservoirScript is Script, Test {
 
         vm.startBroadcast();
 
-        rusd.grantRole(rusd.DEFAULT_ADMIN_ROLE(), ADMIN);
-        rusd.revokeRole(rusd.DEFAULT_ADMIN_ROLE(), msg.sender);
+        // rusd.grantRole(rusd.DEFAULT_ADMIN_ROLE(), ADMIN);
+        // rusd.revokeRole(rusd.DEFAULT_ADMIN_ROLE(), msg.sender);
 
-        srusd.grantRole(srusd.DEFAULT_ADMIN_ROLE(), ADMIN);
-        srusd.revokeRole(srusd.DEFAULT_ADMIN_ROLE(), msg.sender);
+        // srusd.grantRole(srusd.DEFAULT_ADMIN_ROLE(), ADMIN);
+        // srusd.revokeRole(srusd.DEFAULT_ADMIN_ROLE(), msg.sender);
 
-        term.grantRole(term.DEFAULT_ADMIN_ROLE(), ADMIN);
-        term.revokeRole(term.DEFAULT_ADMIN_ROLE(), msg.sender);
+        // term.grantRole(term.DEFAULT_ADMIN_ROLE(), ADMIN);
+        // term.revokeRole(term.DEFAULT_ADMIN_ROLE(), msg.sender);
 
-        sm.grantRole(sm.DEFAULT_ADMIN_ROLE(), ADMIN);
-        sm.revokeRole(sm.DEFAULT_ADMIN_ROLE(), msg.sender);
+        // sm.grantRole(sm.DEFAULT_ADMIN_ROLE(), ADMIN);
+        // sm.revokeRole(sm.DEFAULT_ADMIN_ROLE(), msg.sender);
 
-        psm.grantRole(psm.DEFAULT_ADMIN_ROLE(), ADMIN);
-        psm.revokeRole(psm.DEFAULT_ADMIN_ROLE(), msg.sender);
+        // psm.grantRole(psm.DEFAULT_ADMIN_ROLE(), ADMIN);
+        // psm.revokeRole(psm.DEFAULT_ADMIN_ROLE(), msg.sender);
 
-        termIssuer.grantRole(termIssuer.DEFAULT_ADMIN_ROLE(), ADMIN);
-        termIssuer.revokeRole(termIssuer.DEFAULT_ADMIN_ROLE(), msg.sender);
+        // termIssuer.grantRole(termIssuer.DEFAULT_ADMIN_ROLE(), ADMIN);
+        // termIssuer.revokeRole(termIssuer.DEFAULT_ADMIN_ROLE(), msg.sender);
 
         creditEnforcer.grantRole(creditEnforcer.DEFAULT_ADMIN_ROLE(), ADMIN);
         creditEnforcer.revokeRole(
@@ -353,23 +338,23 @@ contract ReservoirScript is Script, Test {
 
         vm.stopBroadcast();
 
-        assertTrue(rusd.hasRole(rusd.DEFAULT_ADMIN_ROLE(), ADMIN));
-        assertFalse(rusd.hasRole(rusd.DEFAULT_ADMIN_ROLE(), msg.sender));
+        // assertTrue(rusd.hasRole(rusd.DEFAULT_ADMIN_ROLE(), ADMIN));
+        // assertFalse(rusd.hasRole(rusd.DEFAULT_ADMIN_ROLE(), msg.sender));
 
-        assertTrue(srusd.hasRole(srusd.DEFAULT_ADMIN_ROLE(), ADMIN));
-        assertFalse(srusd.hasRole(srusd.DEFAULT_ADMIN_ROLE(), msg.sender));
+        // assertTrue(srusd.hasRole(srusd.DEFAULT_ADMIN_ROLE(), ADMIN));
+        // assertFalse(srusd.hasRole(srusd.DEFAULT_ADMIN_ROLE(), msg.sender));
 
-        assertTrue(term.hasRole(term.DEFAULT_ADMIN_ROLE(), ADMIN));
-        assertFalse(term.hasRole(term.DEFAULT_ADMIN_ROLE(), msg.sender));
+        // assertTrue(term.hasRole(term.DEFAULT_ADMIN_ROLE(), ADMIN));
+        // assertFalse(term.hasRole(term.DEFAULT_ADMIN_ROLE(), msg.sender));
 
-        assertTrue(sm.hasRole(sm.DEFAULT_ADMIN_ROLE(), ADMIN));
-        assertFalse(sm.hasRole(sm.DEFAULT_ADMIN_ROLE(), msg.sender));
+        // assertTrue(sm.hasRole(sm.DEFAULT_ADMIN_ROLE(), ADMIN));
+        // assertFalse(sm.hasRole(sm.DEFAULT_ADMIN_ROLE(), msg.sender));
 
-        assertTrue(psm.hasRole(psm.DEFAULT_ADMIN_ROLE(), ADMIN));
-        assertFalse(psm.hasRole(psm.DEFAULT_ADMIN_ROLE(), msg.sender));
+        // assertTrue(psm.hasRole(psm.DEFAULT_ADMIN_ROLE(), ADMIN));
+        // assertFalse(psm.hasRole(psm.DEFAULT_ADMIN_ROLE(), msg.sender));
 
-        assertTrue(termIssuer.hasRole(sm.DEFAULT_ADMIN_ROLE(), ADMIN));
-        assertFalse(termIssuer.hasRole(sm.DEFAULT_ADMIN_ROLE(), msg.sender));
+        // assertTrue(termIssuer.hasRole(sm.DEFAULT_ADMIN_ROLE(), ADMIN));
+        // assertFalse(termIssuer.hasRole(sm.DEFAULT_ADMIN_ROLE(), msg.sender));
 
         assertTrue(creditEnforcer.hasRole(psm.DEFAULT_ADMIN_ROLE(), ADMIN));
         assertFalse(
