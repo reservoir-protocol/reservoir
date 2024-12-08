@@ -17,8 +17,10 @@ import {IToken} from "src/interfaces/IToken.sol";
 import {IOracle} from "src/interfaces/IOracle.sol";
 
 import {AssetPrice, AssetAdapter} from "src/adapters/AssetAdapter.sol";
-import {MorphoUnderlyingAdapter} from "src/adapters/MorphoUnderlyingAdapter.sol";
-import {VaultSharesOracle} from "src/adapters/VaultSharesOracle.sol";
+import {MorphoRUSDAdapter} from "src/adapters/MorphoRUSDAdapter.sol";
+// import {MorphoUnderlyingAdapter} from "src/adapters/MorphoUnderlyingAdapter.sol";
+// import {VaultSharesOracle} from "src/adapters/VaultSharesOracle.sol";
+import {VaultSharesOracleV2} from "src/adapters/VaultSharesOracleV2.sol";
 
 import {Term} from "src/Term.sol";
 import {TermIssuer} from "src/TermIssuer.sol";
@@ -689,7 +691,80 @@ contract ReservoirScript is Script, Test {
         CreditEnforcer(ca).removeAssetAdapter(morphoUnderlyingAdapter);
     }
 
-    function deployMorphoUnderlyingAdapter(
+    // function deployMorphoUnderlyingAdapter(
+    //     address _admin,
+    //     address _underlying,
+    //     address _vault,
+    //     address _underlyingAggregator,
+    //     uint256 _duration
+    // ) external {
+    //     address morphoUnderlyingAdapterAddr;
+    //     address fundPriceOracleAddr;
+
+    //     vm.startBroadcast();
+
+    //     (
+    //         fundPriceOracleAddr,
+    //         morphoUnderlyingAdapterAddr
+    //     ) = _deployMorphoUnderlyingAdapter(
+    //         _admin,
+    //         _underlying,
+    //         _vault,
+    //         _underlyingAggregator,
+    //         _duration
+    //     );
+
+    //     vm.stopBroadcast();
+
+    //     console.log();
+    //     console.log(
+    //         " * VaultShare/USD Price Feed Address: %s",
+    //         fundPriceOracleAddr
+    //     );
+    //     console.log(" = > constructor(address)");
+    //     console.log(" - - >", address(_vault));
+
+    //     console.log();
+    //     console.log(
+    //         " * Morpho Underlying Adapter Address: %s",
+    //         morphoUnderlyingAdapterAddr
+    //     );
+    //     console.log(
+    //         " = > constructor(address,address,address,address,address,uint256)"
+    //     );
+    //     console.log(" - - >", _admin);
+    //     console.log(" - - >", _underlying);
+    //     console.log(" - - >", _vault);
+    //     console.log(" - - >", _underlyingAggregator);
+    //     console.log(" - - >", fundPriceOracleAddr);
+    //     console.log(" - - >", _duration);
+    // }
+
+    // function _deployMorphoUnderlyingAdapter(
+    //     address _admin,
+    //     address _underlying,
+    //     address _vault,
+    //     address _underlyingAggregator,
+    //     uint256 _duration
+    // ) private returns (address, address) {
+    //     VaultSharesOracle vaultSharesOracle = new VaultSharesOracle(
+    //         AggregatorV3Interface(_underlyingAggregator),
+    //         IERC4626(_vault)
+    //     );
+
+    //     MorphoUnderlyingAdapter morphoUnderlyingAdapter = new MorphoUnderlyingAdapter(
+    //             _admin,
+    //             _underlying,
+    //             _vault,
+    //             _underlyingAggregator,
+    //             address(vaultSharesOracle),
+    //             _duration
+    //         );
+
+    //     return (address(vaultSharesOracle), address(morphoUnderlyingAdapter));
+    // }
+
+    function deployMorphoRUSDAdapter(
         address _admin,
         address _underlying,
         address _vault,
@@ -704,7 +779,7 @@ contract ReservoirScript is Script, Test {
         (
             fundPriceOracleAddr,
             morphoUnderlyingAdapterAddr
-        ) = _deployMorphoUnderlyingAdapter(
+        ) = _deployMorphoRUSDAdapter(
             _admin,
             _underlying,
             _vault,
@@ -719,12 +794,14 @@ contract ReservoirScript is Script, Test {
             " * VaultShare/USD Price Feed Address: %s",
             fundPriceOracleAddr
         );
-        console.log(" = > constructor(address)");
+        console.log(" = > constructor(address,address,uint256)");
+        console.log(" - - >", address(_underlyingAggregator));
         console.log(" - - >", address(_vault));
+        console.log(" - - >", 18);
 
         console.log();
         console.log(
-            " * Morpho Underlying Adapter Address: %s",
+            " * Morpho RUSD Adapter Address: %s",
             morphoUnderlyingAdapterAddr
         );
         console.log(
@@ -738,26 +815,32 @@ contract ReservoirScript is Script, Test {
         console.log(" - - >", _duration);
     }
 
-    function _deployMorphoUnderlyingAdapter(
+    function _deployMorphoRUSDAdapter(
         address _admin,
         address _underlying,
         address _vault,
         address _underlyingAggregator,
         uint256 _duration
     ) private returns (address, address) {
-        VaultSharesOracle vaultSharesOracle = new VaultSharesOracle(
+        // VaultSharesOracle vaultSharesOracle = new VaultSharesOracle(
+        //     AggregatorV3Interface(_underlyingAggregator),
+        //     IERC4626(_vault)
+        // );
+
+        VaultSharesOracleV2 vaultSharesOracle = new VaultSharesOracleV2(
             AggregatorV3Interface(_underlyingAggregator),
-            IERC4626(_vault)
+            IERC4626(_vault),
+            18
         );
 
-        MorphoUnderlyingAdapter morphoUnderlyingAdapter = new MorphoUnderlyingAdapter(
-                _admin,
-                _underlying,
-                _vault,
-                _underlyingAggregator,
-                address(vaultSharesOracle),
-                _duration
-            );
+        MorphoRUSDAdapter morphoUnderlyingAdapter = new MorphoRUSDAdapter(
+            _admin,
+            _underlying,
+            _vault,
+            _underlyingAggregator,
+            address(vaultSharesOracle),
+            _duration
+        );
 
         return (address(vaultSharesOracle), address(morphoUnderlyingAdapter));
     }
