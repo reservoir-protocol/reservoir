@@ -15,7 +15,7 @@ interface ICurveStableSwap {
     function price_oracle(uint256) external view returns (uint256);
 }
 
-contract EthenaSUSDEAdapter is IAssetAdapter, AccessControl {
+contract EthenaUSDEAdapter is IAssetAdapter, AccessControl {
     bytes32 public constant MANAGER =
         keccak256(abi.encode("asset.adapter.manager"));
 
@@ -181,7 +181,6 @@ contract EthenaSUSDEAdapter is IAssetAdapter, AccessControl {
 
     function _fundValue(uint256 amount) private view returns (uint256) {
         return (_fundPriceOracleLatestAnswer() * amount) / 1e18;
-        // return 1e18 * fund.previewRedeem(amount) / curveStableSwap.price_oracle(0); // wrong underlying
     }
 
     function fundBalance() external view returns (uint256) {
