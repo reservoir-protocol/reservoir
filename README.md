@@ -66,6 +66,6 @@ Scripts used for deployment can be found under `bin/`.
 Here are the audits we completed with Halborn:
 1. [Protocol-wide audit](https://docs.google.com/viewerng/viewer?url=https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%252FuV2CWL0AZicnZxx3SgUP%252Fuploads%252FDMjHMORByqrQnWTCL5Rs%252FFortunaFi_Reservoir_Smart_Contract_Security_Audit_Report_Halborn_Final.pdf?alt%3Dmedia%26token%3Dbb69023c-f54b-45c7-a44b-5e151002777e)
 2. [Morpho lending market audit](https://drive.google.com/file/d/1JaIcwJRn169PGhnF_0nRd6E6bYvxmlNv/view)
-3. Cross-chain bridging audit
+3. [Cross-chain bridging audit](https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FuV2CWL0AZicnZxx3SgUP%2Fuploads%2FLNmg84HNDNlNKagf9jLo%2FReservoir%20Protocol%20-%20lz-bridge%20_%20SSC.pdf?alt=media&token=168abe3d-0650-454c-bfa5-592b7c08ad83)
 
 We accept security bug reports at security@reservoir.xyz
