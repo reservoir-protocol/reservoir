@@ -318,7 +318,7 @@ contract MorphoRUSDAdapterTest is Test {
         deal(address(rusd), address(this), accidentalySentAmount, true);
         rusd.transfer(address(adapter), accidentalySentAmount);
 
-        adapter.redeem(redeemAmount);
+        adapter.redeem(metamorpho.convertToShares(redeemAmount));
 
         assertEq(rusd.balanceOf(address(adapter)), accidentalySentAmount);
     }
