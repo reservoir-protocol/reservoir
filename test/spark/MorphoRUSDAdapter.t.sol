@@ -108,21 +108,29 @@ contract SparkUSDSAdapterTest is Test {
 
     function testDivest() external {
         console.log(usdc.balanceOf(address(this)));
-        deal(address(usdc), address(this), 100e6, true);
+        deal(address(usdc), address(this), 2_000e6, true);
         console.log(usdc.balanceOf(address(this)));
 
         usdc.approve(address(adapter), type(uint256).max);
 
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
         console.log(usdc.balanceOf(address(adapter)));
-        adapter.allocate(10e6);
+        adapter.allocate(1_000e6);
         console.log(usdc.balanceOf(address(adapter)));
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
 
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
         console.log(usdc.balanceOf(address(adapter)));
         console.log(susds.balanceOf(address(adapter)));
-        adapter.deposit(10e6);
+        adapter.deposit(1_000e6);
+        console.log(usdc.balanceOf(address(adapter)));
+        console.log(susds.balanceOf(address(adapter)));
+        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+
+        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+        console.log(usdc.balanceOf(address(adapter)));
+        console.log(susds.balanceOf(address(adapter)));
+        adapter.redeem(999e6);
         console.log(usdc.balanceOf(address(adapter)));
         console.log(susds.balanceOf(address(adapter)));
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");

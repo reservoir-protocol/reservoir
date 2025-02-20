@@ -13,6 +13,10 @@ import {IAssetAdapter} from "src/interfaces/IAssetAdapter.sol";
 
 import {console} from "forge-std/console.sol";
 
+interface IUsdsPsmWrapper {
+    function buyGem(address, uint256) external;
+}
+
 interface IPSMVariantAction {
     function swapAndDeposit(
         address,
@@ -47,8 +51,14 @@ contract SparkSUSDSAdapter is IAssetAdapter, AccessControl {
     uint256 public fundRiskWeight; // 100% = 1e6
     uint256 public underlyingRiskWeight; // 100% = 1e6
 
-    IPSMVariantAction psmSwap =
+    IERC20 public constant usds =
+        IERC20(0xdC035D45d973E3EC169d2276DDab16f1e407384F);
+
+    IPSMVariantAction public constant psmSwap =
         IPSMVariantAction(0xd0A61F2963622e992e6534bde4D52fd0a89F39E0);
+
+    IUsdsPsmWrapper public constant psmWrapper =
+        IUsdsPsmWrapper(0xA188EEC8F81263234dA3622A406892F3D630f98c);
 
     constructor(
         address _admin,
@@ -94,6 +104,8 @@ contract SparkSUSDSAdapter is IAssetAdapter, AccessControl {
         // console.log(psmSwap.redeemAndSwap(address(this), amount, amount));
 
         // 0xA188EEC8F81263234dA3622A406892F3D630f98c buyGem
+        usds.approve(address(psmWrapper), type(uint256).max);
+        psmWrapper.buyGem(address(this), amount);
         console.log(" - - - - - - - - - - -  - - - - - - - ");
 
         emit Redeem(msg.sender, amount, block.timestamp);
