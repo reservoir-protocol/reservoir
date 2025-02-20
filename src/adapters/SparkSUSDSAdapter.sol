@@ -77,6 +77,8 @@ contract SparkSUSDSAdapter is IAssetAdapter, AccessControl {
     }
 
     function deposit(uint256 amount) public onlyRole(CONTROLLER) {
+        console.log(underlying.approve(address(psmSwap), amount));
+
         console.log(" - - - - - - - - - - -  - - - - - - - ");
         console.log(
             psmSwap.swapAndDeposit(address(this), amount, amount * 1e12)

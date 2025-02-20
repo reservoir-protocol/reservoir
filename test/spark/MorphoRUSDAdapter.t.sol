@@ -16,10 +16,7 @@ import {console} from "forge-std/console.sol";
 
 // address constant CHAINLINK_USDC_FEED = 0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6;
 ERC20 constant usdc = ERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
-
-// IERC4626 constant metamorphoSteakhouseUsdc = IERC4626(
-//     0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB
-// );
+IERC4626 constant susds = IERC4626(0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD);
 
 contract SparkUSDSAdapterTest is Test {
     event Allocate(address indexed signer, uint256 amount, uint256 timestamp);
@@ -43,11 +40,11 @@ contract SparkUSDSAdapterTest is Test {
     function setUp() external {
         vm.createSelectFork(MAINNET_RPC_URL);
 
-        // Deploy and Configure Morpho Adapter
+        // Deploy and Configure Spark Adapter
         adapter = new SparkSUSDSAdapter(
             address(this),
-            0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD, // SUSDS
-            0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, // USDC
+            address(susds),
+            address(usdc),
             INITIAL_DURATION
         );
 
@@ -80,6 +77,54 @@ contract SparkUSDSAdapterTest is Test {
         console.log(adapter.fundTotalValue());
         //  console.log(1e18 * adapter.fundTotalValue() / 997202987831594277);
         // console.log(curveStableSwap.price_oracle(uint256(0)));
+        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+
+        assertTrue(true);
+    }
+
+    function testInvest() external {
+        console.log(usdc.balanceOf(address(this)));
+        deal(address(usdc), address(this), 100e6, true);
+        console.log(usdc.balanceOf(address(this)));
+
+        usdc.approve(address(adapter), type(uint256).max);
+
+        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+        console.log(usdc.balanceOf(address(adapter)));
+        adapter.allocate(10e6);
+        console.log(usdc.balanceOf(address(adapter)));
+        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+
+        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+        console.log(usdc.balanceOf(address(adapter)));
+        console.log(susds.balanceOf(address(adapter)));
+        adapter.deposit(10e6);
+        console.log(usdc.balanceOf(address(adapter)));
+        console.log(susds.balanceOf(address(adapter)));
+        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+
+        assertTrue(true);
+    }
+
+    function testDivest() external {
+        console.log(usdc.balanceOf(address(this)));
+        deal(address(usdc), address(this), 100e6, true);
+        console.log(usdc.balanceOf(address(this)));
+
+        usdc.approve(address(adapter), type(uint256).max);
+
+        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+        console.log(usdc.balanceOf(address(adapter)));
+        adapter.allocate(10e6);
+        console.log(usdc.balanceOf(address(adapter)));
+        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+
+        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+        console.log(usdc.balanceOf(address(adapter)));
+        console.log(susds.balanceOf(address(adapter)));
+        adapter.deposit(10e6);
+        console.log(usdc.balanceOf(address(adapter)));
+        console.log(susds.balanceOf(address(adapter)));
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
 
         assertTrue(true);
