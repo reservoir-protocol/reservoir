@@ -103,37 +103,34 @@ contract SparkUSDSAdapterTest is Test {
         console.log(susds.balanceOf(address(adapter)));
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
 
+        // TODO: Check totalValue
+
         assertTrue(true);
     }
 
     function testDivest() external {
-        console.log(usdc.balanceOf(address(this)));
         deal(address(usdc), address(this), 2_000e6, true);
-        console.log(usdc.balanceOf(address(this)));
 
         usdc.approve(address(adapter), type(uint256).max);
 
-        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
-        console.log(usdc.balanceOf(address(adapter)));
         adapter.allocate(1_000e6);
-        console.log(usdc.balanceOf(address(adapter)));
-        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
 
-        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
-        console.log(usdc.balanceOf(address(adapter)));
-        console.log(susds.balanceOf(address(adapter)));
         adapter.deposit(1_000e6);
-        console.log(usdc.balanceOf(address(adapter)));
-        console.log(susds.balanceOf(address(adapter)));
-        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
 
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+
         console.log(usdc.balanceOf(address(adapter)));
         console.log(susds.balanceOf(address(adapter)));
+
+        // TODO: Check convert to assets
         adapter.redeem(susds.balanceOf(address(adapter)));
+
         console.log(usdc.balanceOf(address(adapter)));
         console.log(susds.balanceOf(address(adapter)));
+
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+
+        // TODO: Check totalValue
 
         assertTrue(true);
     }

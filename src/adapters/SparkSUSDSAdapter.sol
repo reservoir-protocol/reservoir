@@ -87,26 +87,25 @@ contract SparkSUSDSAdapter is IAssetAdapter, AccessControl {
     }
 
     function deposit(uint256 amount) public onlyRole(CONTROLLER) {
-        console.log(underlying.approve(address(psmSwap), amount));
-
-        console.log(" - - - - - - - - - - -  - - - - - - - ");
-        console.log(
-            psmSwap.swapAndDeposit(address(this), amount, amount * 1e12)
+        require(
+            underlying.approve(address(psmSwap), amount),
+            "error on token approval"
         );
-        console.log(" - - - - - - - - - - -  - - - - - - - ");
 
-        emit Deposit(msg.sender, amount, block.timestamp);
+        uint256 received = psmSwap.swapAndDeposit(
+            address(this),
+            amount,
+            amount * 1e12
+        );
+
+        emit Deposit(msg.sender, received, block.timestamp);
     }
 
     function redeem(uint256 amount) public onlyRole(CONTROLLER) {
-        console.log(" - - - - - - - - - - -  - - - - - - - ");
-        console.log(fund.redeem(amount, address(this), address(this)));
-        // console.log(psmSwap.redeemAndSwap(address(this), amount, amount));
+        uint256 assets = fund.redeem(amount, address(this), address(this));
 
-        // 0xA188EEC8F81263234dA3622A406892F3D630f98c buyGem
-        usds.approve(address(psmWrapper), type(uint256).max);
-        psmWrapper.buyGem(address(this), usds.balanceOf(address(this)) / 1e12);
-        console.log(" - - - - - - - - - - -  - - - - - - - ");
+        usds.approve(address(psmWrapper), assets);
+        psmWrapper.buyGem(address(this), assets / 1e12);
 
         emit Redeem(msg.sender, amount, block.timestamp);
     }
