@@ -130,7 +130,7 @@ contract SparkUSDSAdapterTest is Test {
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
         console.log(usdc.balanceOf(address(adapter)));
         console.log(susds.balanceOf(address(adapter)));
-        adapter.redeem(999e6);
+        adapter.redeem(susds.balanceOf(address(adapter)));
         console.log(usdc.balanceOf(address(adapter)));
         console.log(susds.balanceOf(address(adapter)));
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");

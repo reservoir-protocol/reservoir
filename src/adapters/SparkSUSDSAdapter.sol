@@ -100,12 +100,12 @@ contract SparkSUSDSAdapter is IAssetAdapter, AccessControl {
 
     function redeem(uint256 amount) public onlyRole(CONTROLLER) {
         console.log(" - - - - - - - - - - -  - - - - - - - ");
-        console.log(fund.withdraw(amount * 1e12, address(this), address(this)));
+        console.log(fund.redeem(amount, address(this), address(this)));
         // console.log(psmSwap.redeemAndSwap(address(this), amount, amount));
 
         // 0xA188EEC8F81263234dA3622A406892F3D630f98c buyGem
         usds.approve(address(psmWrapper), type(uint256).max);
-        psmWrapper.buyGem(address(this), amount);
+        psmWrapper.buyGem(address(this), usds.balanceOf(address(this)) / 1e12);
         console.log(" - - - - - - - - - - -  - - - - - - - ");
 
         emit Redeem(msg.sender, amount, block.timestamp);
