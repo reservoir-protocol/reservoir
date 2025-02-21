@@ -11,12 +11,6 @@ import {IOracle} from "src/interfaces/IOracle.sol";
 
 import {IAssetAdapter} from "src/interfaces/IAssetAdapter.sol";
 
-import {console} from "forge-std/console.sol";
-
-interface IUsdsPsmWrapper {
-    function buyGem(address, uint256) external;
-}
-
 interface IPSMVariantAction {
     function swapAndDeposit(
         address,
@@ -41,8 +35,6 @@ contract SparkSUSDSAdapter is IAssetAdapter, AccessControl {
     IERC4626 public immutable fund;
     IERC20 public immutable underlying;
 
-    address public immutable holder;
-
     uint256 public immutable duration;
 
     IOracle public immutable fundPriceOracle;
@@ -51,17 +43,8 @@ contract SparkSUSDSAdapter is IAssetAdapter, AccessControl {
     uint256 public fundRiskWeight; // 100% = 1e6
     uint256 public underlyingRiskWeight; // 100% = 1e6
 
-    IERC20 public constant usds =
-        IERC20(0xdC035D45d973E3EC169d2276DDab16f1e407384F);
-
-    IERC20 public constant susds =
-        IERC20(0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD);
-
     IPSMVariantAction public constant psmSwap =
         IPSMVariantAction(0xd0A61F2963622e992e6534bde4D52fd0a89F39E0);
-
-    IUsdsPsmWrapper public constant psmWrapper =
-        IUsdsPsmWrapper(0xA188EEC8F81263234dA3622A406892F3D630f98c);
 
     constructor(
         address _admin,
@@ -98,7 +81,7 @@ contract SparkSUSDSAdapter is IAssetAdapter, AccessControl {
         uint256 received = psmSwap.swapAndDeposit(
             address(this),
             amount,
-            amount * 1e12 //
+            fund.previewDeposit(amount)
         );
 
         emit Deposit(msg.sender, received, block.timestamp);
@@ -106,11 +89,15 @@ contract SparkSUSDSAdapter is IAssetAdapter, AccessControl {
 
     function redeem(uint256 amount) public onlyRole(CONTROLLER) {
         require(
-            susds.approve(address(psmSwap), amount),
+            fund.approve(address(psmSwap), amount),
             "error on token approval"
         );
 
-        uint256 received = psmSwap.redeemAndSwap(address(this), amount, 0);
+        uint256 received = psmSwap.redeemAndSwap(
+            address(this),
+            amount,
+            fund.previewRedeem(amount) / 1e12
+        );
 
         emit Redeem(msg.sender, received, block.timestamp);
     }
@@ -224,7 +211,7 @@ contract SparkSUSDSAdapter is IAssetAdapter, AccessControl {
     }
 
     function _fundBalance() private view returns (uint256) {
-        return fund.balanceOf(holder);
+        return fund.balanceOf(address(this));
     }
 
     function _underlyingPriceOracleLatestAnswer()

@@ -93,18 +93,38 @@ contract SparkUSDSAdapterTest is Test {
         usdc.approve(address(adapter), type(uint256).max);
 
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
-        console.log(usdc.balanceOf(address(adapter)));
+
+        console.log(adapter.totalValue());
+        console.log(adapter.fundTotalValue());
+        console.log(adapter.underlyingTotalValue());
+
+        // console.log(usdc.balanceOf(address(adapter)));
+
         adapter.allocate(10e6);
-        console.log(usdc.balanceOf(address(adapter)));
-        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+
+        // console.log(usdc.balanceOf(address(adapter)));
 
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
-        console.log(usdc.balanceOf(address(adapter)));
-        console.log(susds.balanceOf(address(adapter)));
-        adapter.deposit(10e6);
-        console.log(usdc.balanceOf(address(adapter)));
-        console.log(susds.balanceOf(address(adapter)));
+
+        console.log(adapter.totalValue());
+        console.log(adapter.fundTotalValue());
+        console.log(adapter.underlyingTotalValue());
+
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+
+        // console.log(usdc.balanceOf(address(adapter)));
+        // console.log(susds.balanceOf(address(adapter)));
+
+        adapter.deposit(10e6);
+
+        // console.log(usdc.balanceOf(address(adapter)));
+        console.log(susds.balanceOf(address(adapter)));
+
+        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+
+        console.log(adapter.totalValue());
+        console.log(adapter.fundTotalValue());
+        console.log(adapter.underlyingTotalValue());
 
         // TODO: Check totalValue
 
@@ -116,24 +136,47 @@ contract SparkUSDSAdapterTest is Test {
 
         usdc.approve(address(adapter), type(uint256).max);
 
-        adapter.allocate(1_000e6);
+        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
 
-        adapter.deposit(1_000e6);
+        console.log(adapter.totalValue());
+        console.log(adapter.fundTotalValue());
+        console.log(adapter.underlyingTotalValue());
+
+        adapter.allocate(1_000e6);
 
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
 
-        console.log(usdc.balanceOf(address(adapter)));
-        console.log(usds.balanceOf(address(adapter)));
+        console.log(adapter.totalValue());
+        console.log(adapter.fundTotalValue());
+        console.log(adapter.underlyingTotalValue());
+
+        adapter.deposit(1_000e6);
+
         console.log(susds.balanceOf(address(adapter)));
+        console.log(susds.previewRedeem(1e18));
+
+        console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+
+        console.log(adapter.totalValue());
+        console.log(adapter.fundTotalValue());
+        console.log(adapter.underlyingTotalValue());
+
+        // console.log(usdc.balanceOf(address(adapter)));
+        // console.log(usds.balanceOf(address(adapter)));
+        // console.log(susds.balanceOf(address(adapter)));
 
         // TODO: Check convert to assets
         adapter.redeem(susds.balanceOf(address(adapter)));
 
-        console.log(usdc.balanceOf(address(adapter)));
-        console.log(usds.balanceOf(address(adapter)));
-        console.log(susds.balanceOf(address(adapter)));
+        // console.log(usdc.balanceOf(address(adapter)));
+        // console.log(usds.balanceOf(address(adapter)));
+        // console.log(susds.balanceOf(address(adapter)));
 
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
+
+        console.log(adapter.totalValue());
+        console.log(adapter.fundTotalValue());
+        console.log(adapter.underlyingTotalValue());
 
         // TODO: Check totalValue
 
