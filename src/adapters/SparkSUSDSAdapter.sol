@@ -54,6 +54,9 @@ contract SparkSUSDSAdapter is IAssetAdapter, AccessControl {
     IERC20 public constant usds =
         IERC20(0xdC035D45d973E3EC169d2276DDab16f1e407384F);
 
+    IERC20 public constant susds =
+        IERC20(0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD);
+
     IPSMVariantAction public constant psmSwap =
         IPSMVariantAction(0xd0A61F2963622e992e6534bde4D52fd0a89F39E0);
 
@@ -95,19 +98,21 @@ contract SparkSUSDSAdapter is IAssetAdapter, AccessControl {
         uint256 received = psmSwap.swapAndDeposit(
             address(this),
             amount,
-            amount * 1e12
+            amount * 1e12 //
         );
 
         emit Deposit(msg.sender, received, block.timestamp);
     }
 
     function redeem(uint256 amount) public onlyRole(CONTROLLER) {
-        uint256 assets = fund.redeem(amount, address(this), address(this));
+        require(
+            susds.approve(address(psmSwap), amount),
+            "error on token approval"
+        );
 
-        usds.approve(address(psmWrapper), assets);
-        psmWrapper.buyGem(address(this), assets / 1e12);
+        uint256 received = psmSwap.redeemAndSwap(address(this), amount, 0);
 
-        emit Redeem(msg.sender, amount, block.timestamp);
+        emit Redeem(msg.sender, received, block.timestamp);
     }
 
     function setUnderlyingRiskWeight(

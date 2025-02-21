@@ -7,6 +7,8 @@ import {AggregatorV3Interface} from "chainlink/contracts/src/v0.8/interfaces/Agg
 import {IPSMVariantAction, SparkSUSDSAdapter} from "src/adapters/SparkSUSDSAdapter.sol";
 
 import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+
+import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {IERC4626} from "openzeppelin-contracts/contracts/interfaces/IERC4626.sol";
 
 import {IOracle} from "src/interfaces/IOracle.sol";
@@ -14,8 +16,9 @@ import {IOracle} from "src/interfaces/IOracle.sol";
 import {Test} from "forge-std/Test.sol";
 import {console} from "forge-std/console.sol";
 
-// address constant CHAINLINK_USDC_FEED = 0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6;
 ERC20 constant usdc = ERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48);
+
+IERC20 constant usds = IERC20(0xdC035D45d973E3EC169d2276DDab16f1e407384F);
 IERC4626 constant susds = IERC4626(0xa3931d71877C0E7a3148CB7Eb4463524FEc27fbD);
 
 contract SparkUSDSAdapterTest is Test {
@@ -120,12 +123,14 @@ contract SparkUSDSAdapterTest is Test {
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
 
         console.log(usdc.balanceOf(address(adapter)));
+        console.log(usds.balanceOf(address(adapter)));
         console.log(susds.balanceOf(address(adapter)));
 
         // TODO: Check convert to assets
         adapter.redeem(susds.balanceOf(address(adapter)));
 
         console.log(usdc.balanceOf(address(adapter)));
+        console.log(usds.balanceOf(address(adapter)));
         console.log(susds.balanceOf(address(adapter)));
 
         console.log(" - - - - - - - - - - - - - - - - -- - - - - - - - - - - ");
