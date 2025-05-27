@@ -217,6 +217,6 @@ contract MorphoUnderlyingAdapter is AccessControl, IAssetAdapter {
     ) external onlyRole(MANAGER) {
         IERC20 token = IERC20(_token);
 
-        token.transfer(_reciever, token.balanceOf(address(this)));
+        token.safeTransfer(_reciever, token.balanceOf(address(this)));
     }
 }
