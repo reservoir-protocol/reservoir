@@ -14,6 +14,8 @@ import {IOracle} from "src/interfaces/IOracle.sol";
 import {IAssetAdapter} from "src/interfaces/IAssetAdapter.sol";
 
 contract MorphoUnderlyingAdapter is AccessControl, IAssetAdapter {
+    using SafeERC20 for IERC20;
+
     bytes32 public constant MANAGER =
         keccak256(abi.encode("asset.adapter.manager"));
 
@@ -54,27 +56,19 @@ contract MorphoUnderlyingAdapter is AccessControl, IAssetAdapter {
     }
 
     function allocate(uint256 _assets) external {
-        // underlying.transferFrom(msg.sender, address(this), _assets);
-        SafeERC20.safeTransferFrom(
-            underlying,
-            msg.sender,
-            address(this),
-            _assets
-        );
+        underlying.safeTransferFrom(msg.sender, address(this), _assets);
 
         emit Allocate(msg.sender, _assets, block.timestamp);
     }
 
     function withdraw(uint256 _assets) external onlyRole(CONTROLLER) {
-        // underlying.transfer(msg.sender, _assets);
-        SafeERC20.safeTransfer(underlying, msg.sender, _assets);
+        underlying.safeTransfer(msg.sender, _assets);
 
         emit Withdraw(msg.sender, _assets, block.timestamp);
     }
 
     function deposit(uint256 _assets) public onlyRole(CONTROLLER) {
-        // underlying.approve(address(fund), _assets);
-        SafeERC20.safeApprove(underlying, address(fund), _assets);
+        SafeERC20.forceApprove(underlying, address(fund), _assets);
 
         fund.deposit(_assets, address(this));
 
