@@ -68,7 +68,7 @@ contract MorphoUnderlyingAdapter is AccessControl, IAssetAdapter {
     }
 
     function deposit(uint256 _assets) public onlyRole(CONTROLLER) {
-        underlying.safeApprove(address(fund), _assets);
+        underlying.forceApprove(address(fund), _assets);
         fund.deposit(_assets, address(this));
 
         emit Deposit(msg.sender, _assets, block.timestamp);
