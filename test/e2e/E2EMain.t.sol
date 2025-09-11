@@ -6,9 +6,9 @@ import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IE
 
 import {IERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol";
 
-import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/ERC20DecimalsMock.sol";
+import {ERC20DecimalsMock} from "../mocks/ERC20DecimalsMock.sol";
 
-import {MockV3Aggregator} from "chainlink/contracts/src/v0.8/tests/MockV3Aggregator.sol";
+import {MockV3Aggregator} from "lib/chainlink/contracts/src/v0.8/tests/MockV3Aggregator.sol";
 
 import {Savingcoin} from "src/Savingcoin.sol";
 import {Stablecoin} from "src/Stablecoin.sol";

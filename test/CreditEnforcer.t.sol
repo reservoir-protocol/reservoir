@@ -4,7 +4,8 @@ pragma solidity ^0.8.24;
 
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
-import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/ERC20DecimalsMock.sol";
+import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/token/ERC20DecimalsMock.sol";
 
 import {MockV3Aggregator} from "chainlink/contracts/src/v0.8/tests/MockV3Aggregator.sol";
 
@@ -44,7 +45,7 @@ contract MockFund is ERC20DecimalsMock {
         string memory name_,
         string memory symbol_,
         uint8 decimals_
-    ) ERC20DecimalsMock(name_, symbol_, decimals_) {}
+    ) ERC20(name_, symbol_) ERC20DecimalsMock(decimals_) {}
 
     function deposit(uint256 amount) external {
         userDeposits[msg.sender] += amount;
@@ -67,8 +68,24 @@ contract MockFund is ERC20DecimalsMock {
     }
 }
 
+contract USDCMockForCreditEnforcer is ERC20 {
+    uint8 private _decimals;
+    
+    constructor(string memory name, string memory symbol, uint8 decimals_) ERC20(name, symbol) {
+        _decimals = decimals_;
+    }
+    
+    function decimals() public view override returns (uint8) {
+        return _decimals;
+    }
+    
+    function mint(address to, uint256 amount) external {
+        _mint(to, amount);
+    }
+}
+
 contract CreditEnforcerTest is Test {
-    ERC20DecimalsMock usdc;
+    USDCMockForCreditEnforcer usdc;
     MockV3Aggregator usdcAggregator;
 
     Stablecoin rusd;
@@ -88,7 +105,7 @@ contract CreditEnforcerTest is Test {
     function setUp() external {
         usdcAggregator = new MockV3Aggregator(8, 1e8);
 
-        usdc = new ERC20DecimalsMock("USD Coin Mock", "USDC", 6);
+        usdc = new USDCMockForCreditEnforcer("USD Coin Mock", "USDC", 6);
 
         usdc.mint(eoa1, 10_000_000e6);
         usdc.mint(eoa2, 10_000_000e6);

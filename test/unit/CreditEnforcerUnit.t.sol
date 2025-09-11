@@ -5,7 +5,7 @@ pragma solidity ^0.8.24;
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 
-import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/ERC20DecimalsMock.sol";
+import {ERC20DecimalsMock} from "../mocks/ERC20DecimalsMock.sol";
 
 import {Savingcoin} from "src/Savingcoin.sol";
 import {Stablecoin} from "src/Stablecoin.sol";

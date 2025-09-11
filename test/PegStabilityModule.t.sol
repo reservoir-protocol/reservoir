@@ -5,7 +5,8 @@ pragma solidity ^0.8.24;
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 import {MockV3Aggregator} from "chainlink/contracts/src/v0.8/tests/MockV3Aggregator.sol";
-import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/ERC20DecimalsMock.sol";
+import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/token/ERC20DecimalsMock.sol";
 
 import {IToken} from "src/interfaces/IToken.sol";
 import {IOracle} from "src/interfaces/IOracle.sol";
@@ -17,8 +18,24 @@ import {PegStabilityModule} from "src/PegStabilityModule.sol";
 import {console} from "forge-std/console.sol";
 import {Test, stdError} from "forge-std/Test.sol";
 
+contract USDCMockForPSM is ERC20 {
+    uint8 private _decimals;
+    
+    constructor(string memory name, string memory symbol, uint8 decimals_) ERC20(name, symbol) {
+        _decimals = decimals_;
+    }
+    
+    function decimals() public view override returns (uint8) {
+        return _decimals;
+    }
+    
+    function mint(address to, uint256 amount) external {
+        _mint(to, amount);
+    }
+}
+
 contract PegStabilityModuleTest is Test {
-    ERC20DecimalsMock usdc;
+    USDCMockForPSM usdc;
     MockV3Aggregator usdcAggregator;
 
     Stablecoin rusd;
@@ -27,7 +44,7 @@ contract PegStabilityModuleTest is Test {
 
     function setUp() external {
         usdcAggregator = new MockV3Aggregator(8, 1e8);
-        usdc = new ERC20DecimalsMock("USD Coin Mock", "USDC", 6);
+        usdc = new USDCMockForPSM("USD Coin Mock", "USDC", 6);
 
         rusd = new Stablecoin(address(this), "Reservoir Stablecoin", "rUSD");
 

@@ -3,10 +3,8 @@
 pragma solidity ^0.8.24;
 
 import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
-
-import {ERC20Votes, ERC20, ERC20Permit} from "openzeppelin-contracts/contracts/token/ERC20/extensions/ERC20Votes.sol";
-
-import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import {ERC20Votes, ERC20} from "openzeppelin-contracts/contracts/token/ERC20/extensions/ERC20Votes.sol";
+import {EIP712} from "openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol";
 
 contract DAM is AccessControl, ERC20Votes {
     uint256 private constant supply = 1_000_000_000e18;
@@ -17,7 +15,7 @@ contract DAM is AccessControl, ERC20Votes {
         address admin_,
         string memory name_,
         string memory symbol_
-    ) ERC20(name_, symbol_) ERC20Permit(name_) {
+    ) ERC20(name_, symbol_) EIP712(name_, "1") {
         _grantRole(DEFAULT_ADMIN_ROLE, admin_);
 
         _mint(admin_, supply);

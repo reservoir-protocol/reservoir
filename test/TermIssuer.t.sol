@@ -8,11 +8,9 @@ import {IERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/IERC1155.
 
 import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
-import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/ERC20DecimalsMock.sol";
+import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/token/ERC20DecimalsMock.sol";
 
 import {ERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/ERC1155.sol";
-
-import {ERC1155Mock} from "openzeppelin-contracts/contracts/mocks/ERC1155Mock.sol";
 
 import {ITerm, Term} from "src/Term.sol";
 import {Stablecoin} from "src/Stablecoin.sol";

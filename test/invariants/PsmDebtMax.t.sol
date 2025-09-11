@@ -6,7 +6,7 @@ import {CommonBase} from "forge-std/Base.sol";
 import {StdCheats} from "forge-std/StdCheats.sol";
 import {StdUtils} from "forge-std/StdUtils.sol";
 
-import "forge-std/InvariantTest.sol";
+import {InvariantTest} from "lib/forge-std/src/InvariantTest.sol";
 
 import "./InvariantMain.t.sol";
 

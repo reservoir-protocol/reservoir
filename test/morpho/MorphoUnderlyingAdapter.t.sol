@@ -8,6 +8,7 @@ import {MorphoUnderlyingAdapter} from "src/adapters/MorphoUnderlyingAdapter.sol"
 import {VaultSharesOracle} from "src/adapters/VaultSharesOracle.sol";
 import {Stablecoin} from "src/Stablecoin.sol";
 import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import {SimpleERC20Mock} from "../mocks/SimpleERC20Mock.sol";
 import {IOracle} from "src/interfaces/IOracle.sol";
 import {IERC4626} from "openzeppelin-contracts/contracts/interfaces/IERC4626.sol";
 
@@ -500,7 +501,7 @@ contract MorphoUnderlyingAdapterTest is Test {
         vm.assume(_reciever != address(0));
         vm.assume(_reciever != address(adapter));
 
-        ERC20 testToken = new ERC20("Test Token", "TTT");
+        SimpleERC20Mock testToken = new SimpleERC20Mock("Test Token", "TTT");
         deal(address(testToken), address(adapter), _amount);
         assertEq(testToken.balanceOf(_reciever), 0);
         assertEq(testToken.balanceOf(address(adapter)), _amount);

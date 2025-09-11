@@ -11,8 +11,8 @@ import {Stablecoin} from "src/Stablecoin.sol";
 import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import {IOracle} from "src/interfaces/IOracle.sol";
 import {IERC4626} from "openzeppelin-contracts/contracts/interfaces/IERC4626.sol";
-import {ERC4626Mock} from "openzeppelin-contracts/contracts/mocks/ERC4626Mock.sol";
-import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/ERC20DecimalsMock.sol";
+import {ERC4626Mock} from "openzeppelin-contracts/contracts/mocks/token/ERC4626Mock.sol";
+import {ERC20DecimalsMock} from "../mocks/ERC20DecimalsMock.sol";
 
 import {Test} from "forge-std/Test.sol";
 import {console} from "forge-std/console.sol";
@@ -58,11 +58,7 @@ contract MorphoUnderlyingAdapterTest is Test {
 
         underlying = new ERC20DecimalsMock("UnderlyingMock", "UND", 6);
 
-        mockVault = new ERC4626Mock(
-            underlying,
-            "UnderlyingMock Vault",
-            "UND_V"
-        );
+        mockVault = new ERC4626Mock(address(underlying));
 
         vaultSharesOracle = new VaultSharesOracle(
             AggregatorV3Interface(address(mockAggregator)),

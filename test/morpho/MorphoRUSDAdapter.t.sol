@@ -9,6 +9,7 @@ import {MorphoRUSDAdapter} from "src/adapters/MorphoRUSDAdapter.sol";
 import {VaultSharesOracleV2} from "src/adapters/VaultSharesOracleV2.sol";
 import {Stablecoin} from "src/Stablecoin.sol";
 import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import {SimpleERC20Mock} from "../mocks/SimpleERC20Mock.sol";
 
 import {Test} from "forge-std/Test.sol";
 import {console} from "forge-std/console.sol";
@@ -392,7 +393,7 @@ contract MorphoRUSDAdapterTest is Test {
     }
 
     function test_recover(uint256 _amount) external {
-        ERC20 testToken = new ERC20("Test Token", "TTT");
+        SimpleERC20Mock testToken = new SimpleERC20Mock("Test Token", "TTT");
 
         deal(address(testToken), address(adapter), _amount);
 

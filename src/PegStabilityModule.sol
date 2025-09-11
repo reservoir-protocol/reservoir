@@ -6,7 +6,7 @@ import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessContr
 
 import {IPegStabilityModule} from "src/interfaces/IPegStabilityModule.sol";
 
-import {Pausable} from "openzeppelin-contracts/contracts/security/Pausable.sol";
+import {Pausable} from "openzeppelin-contracts/contracts/utils/Pausable.sol";
 
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {IERC20Metadata} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";

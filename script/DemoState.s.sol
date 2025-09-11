@@ -2,7 +2,8 @@
 
 pragma solidity ^0.8.13;
 
-import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/ERC20DecimalsMock.sol";
+import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/token/ERC20DecimalsMock.sol";
 
 import {MockV3Aggregator} from "chainlink/contracts/src/v0.8/tests/MockV3Aggregator.sol";
 
@@ -37,8 +38,24 @@ import {Script} from "forge-std/Script.sol";
 
 import {console} from "forge-std/console.sol";
 
+contract USDCMock is ERC20 {
+    uint8 private _decimals;
+    
+    constructor(string memory name, string memory symbol, uint8 decimals_) ERC20(name, symbol) {
+        _decimals = decimals_;
+    }
+    
+    function decimals() public view override returns (uint8) {
+        return _decimals;
+    }
+    
+    function mint(address to, uint256 amount) external {
+        _mint(to, amount);
+    }
+}
+
 contract DemoStateScript is Script, Test {
-    ERC20DecimalsMock usdc;
+    USDCMock usdc;
 
     MockV3Aggregator usdcAggregator;
 
@@ -88,7 +105,7 @@ contract DemoStateScript is Script, Test {
 
         vm.startBroadcast();
 
-        usdc = new ERC20DecimalsMock("USD Coin Mock", "USDC", 6);
+        usdc = new USDCMock("USD Coin Mock", "USDC", 6);
 
         usdc.mint(eoas[1], 1_000_000e6);
         usdc.mint(eoas[2], 1_000_000e6);
