@@ -2,7 +2,8 @@
 
 pragma solidity ^0.8.24;
 
-import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/ERC20DecimalsMock.sol";
+import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import {ERC20DecimalsMock} from "./ERC20DecimalsMock.sol";
 
 contract MockFund is ERC20DecimalsMock {
     struct Order {

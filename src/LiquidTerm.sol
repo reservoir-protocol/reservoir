@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 
+pragma solidity ^0.8.30;
+
 import {IERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol";
 
 import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
@@ -29,11 +31,14 @@ contract LiquidTerm is ERC20 {
         return IERC1155(registry).balanceOf(account, tokenId);
     }
 
-    function _transfer(
+    function _update(
         address from,
         address to,
         uint256 amount
     ) internal override {
-        IERC1155(registry).safeTransferFrom(from, to, tokenId, amount, "");
+        if (from != address(0) && to != address(0)) {
+            IERC1155(registry).safeTransferFrom(from, to, tokenId, amount, "");
+        }
+        // Don't call super._update as we're handling the transfer differently
     }
 }

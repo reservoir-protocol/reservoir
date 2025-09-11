@@ -7,7 +7,7 @@ import {Term} from "src/Term.sol";
 import {Test} from "forge-std/Test.sol";
 import {console} from "forge-std/console.sol";
 import {IERC1155Receiver} from "openzeppelin-contracts/contracts/token/ERC1155/IERC1155Receiver.sol";
-import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/ERC20DecimalsMock.sol";
+import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/token/ERC20DecimalsMock.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract TermUnitTest is Test {

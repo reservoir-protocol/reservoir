@@ -5,7 +5,7 @@ pragma solidity ^0.8.24;
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 import {MockV3Aggregator} from "chainlink/contracts/src/v0.8/tests/MockV3Aggregator.sol";
-import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/ERC20DecimalsMock.sol";
+import {ERC20DecimalsMock} from "../../mocks/ERC20DecimalsMock.sol";
 
 import {IOracle} from "src/interfaces/IOracle.sol";
 import {AssetPrice, AssetAdapter} from "src/adapters/AssetAdapter.sol";

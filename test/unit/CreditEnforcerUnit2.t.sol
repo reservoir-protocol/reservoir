@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.24;
 
-import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 import {IERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol";
 
 import {ERC1967Proxy} from "openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Proxy.sol";
-import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/ERC20DecimalsMock.sol";
+import {ERC20DecimalsMock} from "../mocks/ERC20DecimalsMock.sol";
 
-import {MockV3Aggregator} from "chainlink/contracts/src/v0.8/tests/MockV3Aggregator.sol";
+import {MockV3Aggregator} from "lib/chainlink/contracts/src/v0.8/tests/MockV3Aggregator.sol";
 
 import {Savingcoin} from "src/Savingcoin.sol";
 import {Stablecoin} from "src/Stablecoin.sol";

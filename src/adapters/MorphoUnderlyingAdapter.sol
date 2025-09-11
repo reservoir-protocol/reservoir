@@ -2,6 +2,8 @@
 
 pragma solidity ^0.8.24;
 
+import {SafeERC20} from "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
+
 import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
 import {IERC4626} from "openzeppelin-contracts/contracts/interfaces/IERC4626.sol";
@@ -12,6 +14,8 @@ import {IOracle} from "src/interfaces/IOracle.sol";
 import {IAssetAdapter} from "src/interfaces/IAssetAdapter.sol";
 
 contract MorphoUnderlyingAdapter is AccessControl, IAssetAdapter {
+    using SafeERC20 for IERC20;
+
     bytes32 public constant MANAGER =
         keccak256(abi.encode("asset.adapter.manager"));
 
@@ -52,19 +56,19 @@ contract MorphoUnderlyingAdapter is AccessControl, IAssetAdapter {
     }
 
     function allocate(uint256 _assets) external {
-        underlying.transferFrom(msg.sender, address(this), _assets);
+        underlying.safeTransferFrom(msg.sender, address(this), _assets);
 
         emit Allocate(msg.sender, _assets, block.timestamp);
     }
 
     function withdraw(uint256 _assets) external onlyRole(CONTROLLER) {
-        underlying.transfer(msg.sender, _assets);
+        underlying.safeTransfer(msg.sender, _assets);
 
         emit Withdraw(msg.sender, _assets, block.timestamp);
     }
 
     function deposit(uint256 _assets) public onlyRole(CONTROLLER) {
-        underlying.approve(address(fund), _assets);
+        underlying.forceApprove(address(fund), _assets);
         fund.deposit(_assets, address(this));
 
         emit Deposit(msg.sender, _assets, block.timestamp);
@@ -213,6 +217,6 @@ contract MorphoUnderlyingAdapter is AccessControl, IAssetAdapter {
     ) external onlyRole(MANAGER) {
         IERC20 token = IERC20(_token);
 
-        token.transfer(_reciever, token.balanceOf(address(this)));
+        token.safeTransfer(_reciever, token.balanceOf(address(this)));
     }
 }

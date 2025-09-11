@@ -6,7 +6,8 @@ import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IE
 
 import {IERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol";
 
-import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/ERC20DecimalsMock.sol";
+import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import {ERC20DecimalsMock} from "openzeppelin-contracts/contracts/mocks/token/ERC20DecimalsMock.sol";
 
 import {MockV3Aggregator} from "chainlink/contracts/src/v0.8/tests/MockV3Aggregator.sol";
 
@@ -29,8 +30,24 @@ import {AccountManager} from "src/AccountManager.sol";
 import {Test} from "forge-std/Test.sol";
 import {console} from "forge-std/console.sol";
 
+contract USDCMockForTest is ERC20 {
+    uint8 private _decimals;
+    
+    constructor(string memory name, string memory symbol, uint8 decimals_) ERC20(name, symbol) {
+        _decimals = decimals_;
+    }
+    
+    function decimals() public view override returns (uint8) {
+        return _decimals;
+    }
+    
+    function mint(address to, uint256 amount) external {
+        _mint(to, amount);
+    }
+}
+
 contract AccountManagerTest is Test {
-    ERC20DecimalsMock usdc;
+    USDCMockForTest usdc;
     MockV3Aggregator usdcAggregator;
 
     Stablecoin rusd;
@@ -51,7 +68,7 @@ contract AccountManagerTest is Test {
 
     function setUp() external {
         usdcAggregator = new MockV3Aggregator(8, 1e8);
-        usdc = new ERC20DecimalsMock("USD Coin Mock", "USDC", 6);
+        usdc = new USDCMockForTest("USD Coin Mock", "USDC", 6);
 
         usdc.mint(eoa1, 10_000_000e6);
         usdc.mint(eoa2, 10_000_000e6);

@@ -20,7 +20,7 @@ contract StablecoinV2 is Stablecoin, Ownable, ERC20Pausable {
         address owner,
         string memory name,
         string memory symbol
-    ) Stablecoin(owner, name, symbol) {}
+    ) Stablecoin(owner, name, symbol) Ownable(owner) {}
 
     function pause() external onlyOwner {
         _pause();
@@ -30,12 +30,12 @@ contract StablecoinV2 is Stablecoin, Ownable, ERC20Pausable {
         _unpause();
     }
 
-    function _beforeTokenTransfer(
+    function _update(
         address from,
         address to,
         uint256 amount
     ) internal override(ERC20Pausable, ERC20) {
-        super._beforeTokenTransfer(from, to, amount);
+        super._update(from, to, amount);
     }
 }
 
